@@ -36,7 +36,7 @@ h1{font-size:clamp(22px,4vw,34px);margin:2px 0 4px}.sub{color:#aab8ce;font-size:
 </head>
 <body>
 <section id="selectPanel">
-<h1>大塚事務所格闘録</h1><div class="sub">PIXEL FIGHTER / BUILD 0.3　横画面・タッチ操作対応</div>
+<h1>大塚事務所格闘録</h1><div class="sub">PIXEL FIGHTER / BUILD 0.4　横画面・タッチ操作対応</div>
 <div class="sub">キャラクターを選択。能力・移動速度・飛び道具・特殊技はそれぞれ異なる。</div>
 <div id="roster"></div><button id="start">このキャラクターで対戦開始</button>
 </section>
@@ -53,33 +53,83 @@ h1{font-size:clamp(22px,4vw,34px);margin:2px 0 4px}.sub{color:#aab8ce;font-size:
 </section>
 <script>
 const cast=[
-{name:"大塚蒼生",role:"万能・アーティファクト",color:"#425879",hair:"#20232d",speed:4.2,hp:100,reach:76,weak:7,strong:13,shot: {name:"時空弾",damage:11,speed:8,size:9,color:"#8bd8ff",cool:64},special:"時空の一閃",passive:"連続攻撃の硬直が短い"},
-{name:"羽神ミナ",role:"技巧・鎖",color:"#76518c",hair:"#292333",speed:3.9,hp:94,reach:115,weak:6,strong:11,shot:{name:"鎖撃",damage:9,speed:7,size:7,color:"#d9b5ff",cool:58},special:"死奥の鎖",passive:"近接攻撃のリーチが長い"},
-{name:"住吉",role:"迎撃・カウンター",color:"#667d88",hair:"#20252b",speed:3.5,hp:108,reach:86,weak:8,strong:14,shot:{name:"牽制刃",damage:8,speed:9,size:6,color:"#d8edf0",cool:72},special:"合理的迎撃",passive:"ガード中の被ダメージを大幅軽減"},
-{name:"山中和也",role:"重量・パワー",color:"#925454",hair:"#28252a",speed:2.9,hp:120,reach:92,weak:9,strong:18,shot:{name:"血刃",damage:10,speed:6,size:10,color:"#e75d62",cool:78},special:"破鏡",passive:"特殊技に出血効果"},
-{name:"私和",role:"高速・回避",color:"#4b8878",hair:"#222b2b",speed:5.3,hp:88,reach:72,weak:6,strong:10,shot:{name:"風切",damage:7,speed:11,size:6,color:"#9dffe1",cool:48},special:"瞬動",passive:"移動速度が高く硬直が短い"},
-{name:"定峰",role:"回避・攪乱",color:"#6578b0",hair:"#282b39",speed:4.7,hp:92,reach:80,weak:7,strong:11,shot:{name:"幻弾",damage:8,speed:8,size:8,color:"#b7baff",cool:55},special:"幻歩",passive:"特殊技で短距離ワープ"},
-{name:"漆原",role:"経験・戦術",color:"#897a50",hair:"#28251e",speed:3.8,hp:102,reach:90,weak:8,strong:13,shot:{name:"牽制射",damage:9,speed:8,size:7,color:"#ffe39a",cool:60},special:"見切り",passive:"攻撃後の隙が小さい"}
+{name:"大塚蒼生",role:"万能・アーティファクト",color:"#425879",hair:"#20232d",speed:4.2,hp:100,reach:76,weak:7,strong:13,shot: {name:"時空弾",damage:11,speed:8,size:9,color:"#8bd8ff",cool:780},special:"時空の一閃",passive:"連続攻撃の硬直が短い"},
+{name:"羽神ミナ",role:"技巧・鎖",color:"#76518c",hair:"#292333",speed:3.9,hp:94,reach:115,weak:6,strong:11,shot:{name:"鎖撃",damage:9,speed:7,size:7,color:"#d9b5ff",cool:700},special:"死奥の鎖",passive:"近接攻撃のリーチが長い"},
+{name:"住吉",role:"迎撃・カウンター",color:"#667d88",hair:"#20252b",speed:3.5,hp:108,reach:86,weak:8,strong:14,shot:{name:"牽制刃",damage:8,speed:9,size:6,color:"#d8edf0",cool:860},special:"合理的迎撃",passive:"ガード中の被ダメージを大幅軽減"},
+{name:"山中和也",role:"重量・パワー",color:"#925454",hair:"#28252a",speed:2.9,hp:120,reach:92,weak:9,strong:18,shot:{name:"血刃",damage:10,speed:6,size:10,color:"#e75d62",cool:950},special:"破鏡",passive:"特殊技に出血効果"},
+{name:"私和",role:"高速・回避",color:"#4b8878",hair:"#222b2b",speed:5.3,hp:88,reach:72,weak:6,strong:10,shot:{name:"風切",damage:7,speed:11,size:6,color:"#9dffe1",cool:590},special:"瞬動",passive:"移動速度が高く硬直が短い"},
+{name:"定峰",role:"回避・攪乱",color:"#6578b0",hair:"#282b39",speed:4.7,hp:92,reach:80,weak:7,strong:11,shot:{name:"幻弾",damage:8,speed:8,size:8,color:"#b7baff",cool:660},special:"幻歩",passive:"特殊技で短距離ワープ"},
+{name:"漆原",role:"経験・戦術",color:"#897a50",hair:"#28251e",speed:3.8,hp:102,reach:90,weak:8,strong:13,shot:{name:"牽制射",damage:9,speed:8,size:7,color:"#ffe39a",cool:720},special:"見切り",passive:"攻撃後の隙が小さい"}
 ];
 const $=id=>document.getElementById(id),canvas=$("arena"),ctx=canvas.getContext("2d");
 let selected=0,p=null,e=null,shots=[],running=false,last=0,keys={},stickPointer=null,axis=0,guard=false,round=1;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function drawMini(cv,d){let c=cv.getContext("2d");c.fillStyle="#e6e0d3";c.fillRect(0,0,cv.width,cv.height);drawFighter(c,{...make(d,cv.width/2,1,false),y:cv.height-8},true)}
 cast.forEach((d,i)=>{let b=document.createElement("button");b.className="fighter"+(i===0?" selected":"");let cv=document.createElement("canvas");cv.width=130;cv.height=60;cv.style.width="100%";cv.style.height="60px";cv.style.imageRendering="pixelated";drawMini(cv,d);let n=document.createElement("b");n.textContent=d.name;let r=document.createElement("small");r.textContent=d.role;let s=document.createElement("div");s.className="stats";s.textContent="HP "+d.hp+" / SPEED "+d.speed+" / "+d.special;b.append(cv,n,r,s);b.onclick=()=>{selected=i;document.querySelectorAll(".fighter").forEach((x,j)=>x.classList.toggle("selected",i===j))};$("roster").append(b)});
-function make(d,x,dir,isCPU){return{d,x,y:425,dir,hp:d.hp,max:d.hp,vy:0,ground:true,cool:0,shotCool:0,stun:0,attackTime:0,attackKind:"",bleed:0,guard:false,isCPU,ai:0,flash:0}}
+function make(d,x,dir,isCPU){return{d,x,y:425,dir,hp:d.hp,max:d.hp,vy:0,ground:true,cool:0,shotCool:0,stun:0,attackTime:0,attackKind:"",bleed:0,guard:false,isCPU,ai:0,flash:0,anim:0,comboWindow:0,comboStage:0,guardMeter:100,guardBreak:0,airAttackUsed:false}}
 function say(s){$("status").textContent=s}
 function begin(){let idx;do{idx=Math.floor(Math.random()*cast.length)}while(idx===selected);p=make(cast[selected],250,1,false);e=make(cast[idx],710,-1,true);shots=[];running=true;last=0;keys={};axis=0;guard=false;$("selectPanel").classList.add("hidden");$("game").classList.remove("hidden");$("endPanel").classList.add("hidden");$("pName").textContent=p.d.name;$("eName").textContent=e.d.name+"（CPU）";$("round").textContent="ROUND "+round;say("FIGHT!");requestAnimationFrame(loop)}
-function melee(f,t,kind){if(!running||f.cool>0||f.stun>0||f.attackTime>0)return;let d=kind==="weak"?f.d.weak:f.d.strong,range=kind==="weak"?f.d.reach:f.d.reach+14;f.attackKind=kind;f.attackTime=kind==="weak"?15:24;f.cool=(kind==="weak"?27:45)*(f.d.name==="漆原"?.78:1);if(Math.abs(t.x-f.x)<=range&&Math.abs(t.y-f.y)<90&&f.dir===(t.x>f.x?1:-1)){let damage=d;if(t.guard)damage=Math.max(1,Math.ceil(d*(t.d.name==="住吉"?.25:.48)));t.hp=Math.max(0,t.hp-damage);t.stun=t.guard?5:kind==="weak"?11:18;t.flash=8;t.x=clamp(t.x+f.dir*(t.guard?5:17),45,915);say(f.d.name+"："+(kind==="weak"?"弱攻撃":"強攻撃")+"！");checkWin()}}
-function shoot(f,forced=false){if(!running||f.shotCool>0||f.stun>0||(f.attackTime>0&&!forced))return;let q=f.d.shot;shots.push({x:f.x+f.dir*25,y:f.y-65,vx:f.dir*q.speed,damage:q.damage,size:q.size,color:q.color,owner:f,life:150});f.shotCool=q.cool;f.attackTime=10;f.attackKind="shot";say(f.d.name+"："+q.name+"！")}
-function special(f,t){if(!running||f.cool>0||f.stun>0||f.attackTime>0)return;let name=f.d.name;f.cool=name==="私和"?50:62;f.attackTime=0;f.attackKind="special";if(name==="定峰"){f.x=clamp(t.x-f.dir*70,45,915);f.dir=t.x>f.x?1:-1;meleeEffect(f,t,13,100,"幻歩");return}if(name==="羽神ミナ"){meleeEffect(f,t,17,150,"死奥の鎖");return}if(name==="住吉"){f.guard=true;f.attackTime=34;say("住吉：合理的迎撃！");return}if(name==="山中和也"){meleeEffect(f,t,21,105,"破鏡");if(Math.abs(t.x-f.x)<110)t.bleed=180;return}if(name==="漆原"){f.guard=true;f.attackTime=0;shoot(f,true);return}if(name==="私和"){f.x=clamp(f.x+f.dir*95,45,915);meleeEffect(f,t,15,85,"瞬動");return}shoot(f)}
-function meleeEffect(f,t,dmg,range,label){if(Math.abs(t.x-f.x)<=range&&f.dir===(t.x>f.x?1:-1)){t.hp=Math.max(0,t.hp-dmg);t.stun=18;t.flash=10;t.x=clamp(t.x+f.dir*20,45,915);say(f.d.name+"："+label+"！");checkWin()}else say(f.d.name+"："+label+"！")}
+function melee(f,t,kind){
+ const chained=f.comboWindow>0&&f.attackTime<95;
+ if(!running||f.stun>0||f.attackTime>0&&!chained||f.cool>0&&!chained||(!f.ground&&f.airAttackUsed))return;
+ const d=kind==="weak"?f.d.weak:f.d.strong,range=(kind==="weak"?f.d.reach:f.d.reach+14);
+ const airborne=!f.ground,damageScale=airborne?.82:1;
+ f.attackKind=airborne?"air-"+kind:kind;f.attackTime=kind==="weak"?190:270;
+ f.cool=(kind==="weak"?430:690)*(f.d.name==="漆原"?.78:1);
+ f.comboWindow=620;f.comboStage=chained?f.comboStage+1:1;if(f.comboStage>=3)f.comboWindow=0;
+ if(airborne)f.airAttackUsed=true;
+ if(Math.abs(t.x-f.x)<=range&&Math.abs(t.y-f.y)<(airborne?125:90)&&f.dir===(t.x>f.x?1:-1)){
+  let damage=Math.max(1,Math.round(d*damageScale)),broken=false;
+  if(t.guard){t.guardMeter=Math.max(0,t.guardMeter-(kind==="strong"?34:20));damage=Math.max(1,Math.ceil(d*(t.d.name==="住吉"?.22:.42)));if(t.guardMeter<=0){t.guard=false;t.guardBreak=950;t.stun=720;damage=Math.ceil(d*1.25);broken=true}}
+  t.hp=Math.max(0,t.hp-damage);if(!broken)t.stun=t.guard?85:kind==="weak"?145:230;
+  t.flash=110;t.x=clamp(t.x+f.dir*(t.guard?5:17),45,915);
+  say(broken?t.d.name+"のガードブレイク！":f.d.name+"："+(airborne?"空中":"")+(kind==="weak"?"弱攻撃":"強攻撃")+"！");
+  checkWin();
+ }
+}
+function shoot(f,forced=false){if(!running||f.shotCool>0||f.stun>0||(f.attackTime>0&&!(forced&&f.comboWindow>0&&f.attackTime<95)))return;let q=f.d.shot;shots.push({x:f.x+f.dir*25,y:f.y-65,vx:f.dir*q.speed,damage:q.damage,size:q.size,color:q.color,owner:f,life:150});f.shotCool=q.cool;f.attackTime=155;f.attackKind="shot";f.comboWindow=0;say(f.d.name+"："+q.name+"！")}
+function special(f,t){const chained=f.comboWindow>0&&f.attackTime<95;if(!running||f.stun>0||f.attackTime>0&&!chained||f.cool>0&&!chained)return;let name=f.d.name;f.cool=(name==="私和"?560:760);f.attackTime=190;f.attackKind="special";f.comboWindow=0;if(name==="定峰"){f.x=clamp(t.x-f.dir*70,45,915);f.dir=t.x>f.x?1:-1;meleeEffect(f,t,13,100,"幻歩");return}if(name==="羽神ミナ"){meleeEffect(f,t,17,150,"死奥の鎖");return}if(name==="住吉"){f.guard=true;f.attackTime=520;f.guardMeter=Math.min(100,f.guardMeter+25);say("住吉：合理的迎撃！");return}if(name==="山中和也"){meleeEffect(f,t,21,105,"破鏡");if(Math.abs(t.x-f.x)<110)t.bleed=180;return}if(name==="漆原"){f.guard=true;f.attackTime=0;shoot(f,true);return}if(name==="私和"){f.x=clamp(f.x+f.dir*95,45,915);meleeEffect(f,t,15,85,"瞬動");return}shoot(f)}
+function meleeEffect(f,t,dmg,range,label){if(Math.abs(t.x-f.x)<=range&&f.dir===(t.x>f.x?1:-1)){t.hp=Math.max(0,t.hp-dmg);t.stun=230;t.flash=140;t.x=clamp(t.x+f.dir*20,45,915);say(f.d.name+"："+label+"！");checkWin()}else say(f.d.name+"："+label+"！")}
 function checkWin(){if(p.hp<=0||e.hp<=0){running=false;let winner=p.hp>0?p.d.name:e.d.name;$("resultText").textContent=winner+" WIN!";$("endPanel").classList.remove("hidden")}}
-function updateF(f,t,dt){let k=dt/16.67;f.cool=Math.max(0,f.cool-dt);f.shotCool=Math.max(0,f.shotCool-dt);f.stun=Math.max(0,f.stun-dt);f.attackTime=Math.max(0,f.attackTime-dt);f.flash=Math.max(0,f.flash-dt);if(f.bleed>0){let old=Math.ceil(f.bleed/60);f.bleed=Math.max(0,f.bleed-dt);if(Math.ceil(f.bleed/60)<old){f.hp=Math.max(0,f.hp-1);checkWin()}}if(f.attackTime===0&&f.isCPU)f.guard=false;
+function updateF(f,t,dt){let k=dt/16.67;f.anim+=dt;f.cool=Math.max(0,f.cool-dt);f.shotCool=Math.max(0,f.shotCool-dt);f.stun=Math.max(0,f.stun-dt);f.attackTime=Math.max(0,f.attackTime-dt);f.flash=Math.max(0,f.flash-dt);f.comboWindow=Math.max(0,f.comboWindow-dt);f.guardBreak=Math.max(0,f.guardBreak-dt);if(!f.guard&&f.guardBreak<=0)f.guardMeter=Math.min(100,f.guardMeter+dt*.018);if(f.guardBreak>0)f.guard=false;if(f.bleed>0){let old=Math.ceil(f.bleed/60);f.bleed=Math.max(0,f.bleed-dt);if(Math.ceil(f.bleed/60)<old){f.hp=Math.max(0,f.hp-1);checkWin()}}if(f.attackTime===0&&f.isCPU)f.guard=false;
 if(f.isCPU){f.ai+=dt;f.dir=t.x>f.x?1:-1;if(f.stun<=0&&f.attackTime<=0){let dist=Math.abs(t.x-f.x);if(dist>270){f.x+=f.dir*f.d.speed*.8*k}else if(dist>f.d.reach+25){f.x+=f.dir*f.d.speed*.65*k;if(f.ai>850){f.ai=0;shoot(f)}}else if(f.ai>650){f.ai=0;let r=Math.random();if(r<.34)melee(f,t,"weak");else if(r<.68)melee(f,t,"strong");else special(f,t)}else if(f.ai>450&&f.d.name==="住吉"){f.ai=0;f.guard=true;f.attackTime=22}}}
-else if(f.stun<=0&&f.attackTime<=0){let move=axis;if(keys.left||keys.a)move=-1;if(keys.right||keys.d)move=1;if(move){f.x+=move*f.d.speed*k;f.dir=t.x>f.x?1:-1}if(keys.jump&&f.ground){f.vy=-9.5;f.ground=false}f.guard=guard}
-if(!f.ground){f.y+=f.vy*k;f.vy+=.48*k;if(f.y>=425){f.y=425;f.vy=0;f.ground=true}}f.x=clamp(f.x,45,915)}
-function updateShots(dt){for(let i=shots.length-1;i>=0;i--){let s=shots[i];s.x+=s.vx*dt/16.67;s.life-=dt;let target=s.owner===p?e:p;if(Math.abs(s.x-target.x)<s.size+16&&Math.abs(s.y-(target.y-48))<42){let dmg=target.guard?Math.max(1,Math.ceil(s.damage*.5)):s.damage;target.hp=Math.max(0,target.hp-dmg);target.stun=target.guard?3:9;target.flash=7;if(s.owner.d.name==="山中和也")target.bleed=120;shots.splice(i,1);checkWin();continue}if(s.life<=0||s.x<0||s.x>960)shots.splice(i,1)}}
-function drawFighter(c,f,mini=false){let x=f.x,y=f.y,scale=mini?.72:1;c.save();c.translate(x,y);c.scale(f.dir,1);c.fillStyle="#3338";c.fillRect(-20*scale,0,40*scale,5*scale);let col=f.flash>0?"#fff":f.d.color;c.fillStyle="#29364c";c.fillRect(-12*scale,-32*scale,9*scale,32*scale);c.fillRect(3*scale,-32*scale,9*scale,32*scale);c.fillStyle=col;c.fillRect(-15*scale,-75*scale,30*scale,45*scale);c.fillRect(-21*scale,-70*scale,7*scale,29*scale);c.fillRect(14*scale,-70*scale,7*scale,29*scale);c.fillStyle="#e7b995";c.fillRect(-12*scale,-101*scale,24*scale,25*scale);c.fillStyle=f.d.hair;c.fillRect(-14*scale,-105*scale,28*scale,10*scale);c.fillRect(-16*scale,-99*scale,6*scale,15*scale);c.fillRect(10*scale,-100*scale,6*scale,12*scale);c.fillStyle="#25232a";c.fillRect(5*scale,-93*scale,3*scale,3*scale);if(f.guard){c.strokeStyle="#9fe5ff";c.lineWidth=4;c.strokeRect(-26*scale,-108*scale,52*scale,112*scale)}if(f.attackTime>0){c.fillStyle=f.attackKind==="special"?"#ffe08a":"#fff4d0";c.fillRect(16*scale,-73*scale,42*scale,5*scale)}c.restore()}
+else if(f.stun<=0&&f.attackTime<=0){let move=axis;if(keys.left||keys.a)move=-1;if(keys.right||keys.d)move=1;if(move){f.x+=move*f.d.speed*k;f.dir=t.x>f.x?1:-1}if(keys.jump&&f.ground){f.vy=-9.5;f.ground=false;f.airAttackUsed=false}f.guard=guard&&f.guardBreak<=0}
+if(!f.ground){f.y+=f.vy*k;f.vy+=.48*k;if(f.y>=425){f.y=425;f.vy=0;f.ground=true;f.airAttackUsed=false}}f.x=clamp(f.x,45,915)}
+function updateShots(dt){for(let i=shots.length-1;i>=0;i--){let s=shots[i];s.x+=s.vx*dt/16.67;s.life-=dt;let target=s.owner===p?e:p;if(Math.abs(s.x-target.x)<s.size+16&&Math.abs(s.y-(target.y-48))<42){let dmg=target.guard?Math.max(1,Math.ceil(s.damage*.5)):s.damage;target.hp=Math.max(0,target.hp-dmg);target.stun=target.guard?75:145;target.flash=110;if(s.owner.d.name==="山中和也")target.bleed=120;shots.splice(i,1);checkWin();continue}if(s.life<=0||s.x<0||s.x>960)shots.splice(i,1)}}
+function drawFighter(c,f,mini=false){
+ const x=f.x,y=f.y,scale=mini?.72:1,phase=f.anim/95;
+ const moving=f.isCPU?Math.abs(f.x-(f._lastX??f.x))>.15:Math.abs(axis)>.1||keys.a||keys.d;
+ const airborne=!f.ground,attacking=f.attackTime>0&&!f.guard,blocking=f.guard;
+ const swing=Math.sin(phase)* (moving?5:1),body=f.d.color;
+ c.save();c.translate(x,y);c.scale(f.dir,1);
+ c.fillStyle="#3338";c.fillRect(-20*scale,0,40*scale,5*scale);
+ let legA=airborne?-12:swing,legB=airborne?8:-swing;
+ if(f.d.name==="山中和也"){legA*=.65;legB*=.65}
+ c.fillStyle="#29364c";c.fillRect((-12+legA*.35)*scale,-32*scale,10*scale,(32+Math.max(0,-legA))*scale);c.fillRect((3+legB*.35)*scale,-32*scale,10*scale,(32+Math.max(0,-legB))*scale);
+ const col=f.flash>0?"#fff":body;
+ c.fillStyle=col;
+ if(f.d.name==="山中和也")c.fillRect(-19*scale,-78*scale,38*scale,48*scale);
+ else c.fillRect(-15*scale,-75*scale,30*scale,45*scale);
+ c.fillStyle=col;
+ let armX=attacking?37:blocking?7:20,armY=attacking?-66:blocking?-82:-70;
+ if(f.d.name==="羽神ミナ"){armX=attacking?48:24;armY=attacking?-60:-68}
+ if(f.d.name==="住吉"){armX=blocking?18:attacking?34:13;armY=blocking?-91:-67}
+ if(f.d.name==="山中和也"){armX=attacking?34:22;armY=attacking?-58:-68}
+ if(f.d.name==="私和"){armX=attacking?42:16;armY=attacking?-75:-72}
+ if(f.d.name==="定峰"){armX=attacking?38:24;armY=attacking?-83:-65}
+ if(f.d.name==="漆原"){armX=attacking?34:19;armY=attacking?-63:-73}
+ c.fillRect(-21*scale,-70*scale,7*scale,29*scale);
+ c.fillRect(armX*scale,armY*scale,7*scale,25*scale);
+ c.fillStyle="#e7b995";c.fillRect(-12*scale,-101*scale,24*scale,25*scale);
+ c.fillStyle=f.d.hair;c.fillRect(-14*scale,-105*scale,28*scale,10*scale);c.fillRect(-16*scale,-99*scale,6*scale,15*scale);c.fillRect(10*scale,-100*scale,6*scale,12*scale);
+ c.fillStyle="#25232a";c.fillRect(5*scale,-93*scale,3*scale,3*scale);
+ if(f.d.name==="羽神ミナ"){c.strokeStyle="#d9b5ff";c.lineWidth=3*scale;c.beginPath();c.moveTo(armX*scale,(armY+18)*scale);c.quadraticCurveTo(58*scale,-28*scale,attacking?88*scale:40*scale,-55*scale);c.stroke()}
+ if(f.d.name==="大塚蒼生"&&attacking){c.strokeStyle="#8bd8ff";c.lineWidth=3*scale;c.beginPath();c.arc(35*scale,-65*scale,20*scale,-1.2,1.1);c.stroke()}
+ if(f.d.name==="山中和也"&&attacking){c.fillStyle="#e75d62";c.fillRect(35*scale,-58*scale,24*scale,5*scale)}
+ if(blocking){c.strokeStyle="#9fe5ff";c.lineWidth=4*scale;c.strokeRect(-26*scale,-108*scale,52*scale,112*scale)}
+ if(attacking){c.fillStyle=f.attackKind==="special"?"#ffe08a":"#fff4d0";c.fillRect(armX*scale,(armY+18)*scale,attacking?30*scale:12*scale,5*scale)}
+ c.restore();f._lastX=f.x;
+}
 function render(){ctx.clearRect(0,0,960,540);let g=ctx.createLinearGradient(0,0,0,540);g.addColorStop(0,"#aebdca");g.addColorStop(.65,"#d8d1bd");g.addColorStop(1,"#7d897f");ctx.fillStyle=g;ctx.fillRect(0,0,960,540);ctx.fillStyle="#8995a0";for(let i=0;i<12;i++){let x=i*86;ctx.fillRect(x,185+(i%4)*15,62,220)}ctx.fillStyle="#e5d8b8";ctx.fillRect(0,430,960,110);ctx.fillStyle="#58635f";ctx.fillRect(0,430,960,5);ctx.fillStyle="#3d4a52";ctx.fillRect(370,60,220,42);ctx.fillStyle="#f7e9c8";ctx.font="bold 18px monospace";ctx.textAlign="center";ctx.fillText("OTSUKA OFFICE",480,87);[p,e].forEach(f=>drawFighter(ctx,f));shots.forEach(s=>{ctx.fillStyle=s.color;ctx.shadowColor=s.color;ctx.shadowBlur=16;ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0});$("pBar").style.width=(p.hp/p.max*100)+"%";$("eBar").style.width=(e.hp/e.max*100)+"%"}
 function loop(t){if(!running){render();return}let dt=Math.min(34,t-(last||t));last=t;updateF(p,e,dt);updateF(e,p,dt);updateShots(dt);render();if(running)requestAnimationFrame(loop)}
 $("start").onclick=begin;$("back").onclick=()=>{running=false;$("game").classList.add("hidden");$("selectPanel").classList.remove("hidden")};$("rematch").onclick=begin;$("toSelect").onclick=()=>{$("endPanel").classList.add("hidden");$("game").classList.add("hidden");$("selectPanel").classList.remove("hidden");round=1};
