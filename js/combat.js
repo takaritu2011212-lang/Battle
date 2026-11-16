@@ -1,6 +1,9 @@
+function pushMotion(token){if(!p)return;const now=performance.now();p.commandBuffer=p.commandBuffer.filter(v=>now-v.t<1100);if(p.commandBuffer[p.commandBuffer.length-1]?.v!==token)p.commandBuffer.push({v:token,t:now});if(p.commandBuffer.length>8)p.commandBuffer.shift()}
+function tryCommand(f,t,code){const now=performance.now();f.commandBuffer=f.commandBuffer.filter(v=>now-v.t<950);const seq=f.commandBuffer.map(v=>v.v).join("");if(code==="P"&&seq.endsWith("DF")){f.commandBuffer=[];f.attackTime=260;f.cool=850;const q=f.d.shot;const spawn=(vy=0,off=0)=>shots.push({x:f.x+f.dir*25,y:f.y-65+off,vx:f.dir*q.speed*1.2,vy,damage:Math.round(q.damage*1.45),size:q.size*1.25,color:q.color,owner:f,life:160,type:q.type||"normal",hitCount:0,turn:false});if(q.type==="triple"){spawn(-1,-8);spawn();spawn(1,8)}else spawn();say(f.d.name+"："+f.d.special+"・連環 "+ "↓→+P");return true}if(code==="K"&&seq.endsWith("FDF")){f.commandBuffer=[];f.attackTime=320;f.cool=900;meleeEffect(f,t,Math.round(f.d.strong*1.55),f.d.reach+30,"突進奥義");return true}if(code==="P"&&seq.endsWith("BB")){f.commandBuffer=[];f.x=clamp(f.x-f.dir*45,45,915);f.focus=420;f.attackTime=220;f.cool=900;say(f.d.name+"：後退反撃 ←←+P");return true}return false}
 function attackButton(f,t,code){
  const m={P:["weak",1],K:["weak",.92]}[code];
  if(!running||!m||f.stun>0||(!f.ground&&f.airAttackUsed))return;
+ if(tryCommand(f,t,code))return;
  const crouch=f.ground&&(f.crouch||f===p&&axisY>.35||f===p&&keys.arrowdown);
  const airborne=!f.ground;
  const toward=f===p?(axis>0&&f.dir>0||axis<0&&f.dir<0||keys.d&&f.dir>0||keys.a&&f.dir<0):(Math.abs(t.x-f.x)>f.d.reach+10);
@@ -14,10 +17,10 @@ function attackButton(f,t,code){
  const routeHit=route===routeMap[f.d.name];if(routeHit)f.comboBuffer=[];
  const base=strong?f.d.strong:rank==="middle"?Math.round(f.d.weak*1.35):rank==="lower"?Math.round(f.d.weak*1.12):rank==="upper"?Math.round(f.d.weak*1.25):f.d.weak;
  const damage=Math.max(1,Math.round(base*scale*(chained ? 0.9 : 1)*(f.ground ? 1 : 0.82)*(routeHit?1.3:1)));
- const reach=f.d.reach*(rank==="weak"?.92:rank==="medium"?1.04:1.13);
+ const reach=f.d.reach*(strong?1.16:rank==="middle"?1.04:rank==="lower"?.9:1.08);
  f.attackKind=code;f.attackTime=rank==="upper"?230:rank==="lower"?205:strong?300:175;f.cool=strong?610:rank==="upper"?420:rank==="lower"?380:280;f.comboWindow=strong?0:660;f.moveState="attack";f.moveTimer=f.attackTime;
  if(!f.ground)f.airAttackUsed=true;
- if(Math.abs(t.x-f.x)<=reach&&Math.abs(t.y-f.y)<125&&f.dir===(t.x>f.x?1:-1)){
+ if(Math.abs(t.x-f.x)<=reach&&Math.abs(t.y-f.y)<125&&f.dir===(t.x>f.x?1:-1)&&!(rank==="upper"&&t.crouch)){
   let dmg=damage,blocked=t.guard&&t.guardBreak<=0&&((rank==="upper"||rank==="middle")?!t.crouch:rank==="lower"?t.crouch:true),armored=t.focus>0;
   if(armored){t.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));blocked=true;say("FOCUS ARMOR!");}
   if(blocked&&t.guard){t.guardMeter=Math.max(0,t.guardMeter-(strong?38:rank==="lower"?24:17));dmg=Math.max(1,Math.ceil(dmg*(t.d.name==="住吉"?.2:.38)));if(t.guardMeter<=0){t.guard=false;t.guardBreak=1050;t.stun=820;dmg=Math.ceil(damage*1.25);say("GUARD CRUSH!");}}
@@ -55,7 +58,7 @@ function special(f,t){const chained=f.comboWindow>0&&f.attackTime<120;if(!runnin
 function meleeEffect(f,t,dmg,range,label){if(Math.abs(t.x-f.x)<=range&&f.dir===(t.x>f.x?1:-1)){dmg=Math.round(dmg*(f.attackKind==="super"?1.8:1));const armored=t.focus>0;if(armored){t.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4))}t.hp=Math.max(0,t.hp-dmg);t.stun=armored?0:230;t.flash=140;t.x=clamp(t.x+f.dir*20,45,915);say(f.d.name+"："+label+"！");checkWin()}else say(f.d.name+"："+label+"！")}
 function checkWin(){if(p.hp<=0||e.hp<=0){running=false;let winner=p.hp>0?p.d.name:e.d.name;$("resultText").textContent=winner+" WIN!";$("endPanel").classList.remove("hidden")}}
 function updateF(f,t,dt){let k=dt/16.67;f.anim+=dt;f.crouch=!!(f.ground&&f===p&&(axisY>.35||keys.arrowdown));f.moveTimer=Math.max(0,f.moveTimer-dt);f.focus=Math.max(0,f.focus-dt);f.comboTimer=Math.max(0,f.comboTimer-dt);if(f.comboTimer===0)f.comboCount=0;if(f.moveTimer===0&&f.attackTime===0)f.moveState=f.ground?"idle":"jump";f.cool=Math.max(0,f.cool-dt);f.shotCool=Math.max(0,f.shotCool-dt);f.stun=Math.max(0,f.stun-dt);f.attackTime=Math.max(0,f.attackTime-dt);f.flash=Math.max(0,f.flash-dt);f.comboWindow=Math.max(0,f.comboWindow-dt);f.guardBreak=Math.max(0,f.guardBreak-dt);if(!f.guard&&f.guardBreak<=0)f.guardMeter=Math.min(100,f.guardMeter+dt*.018);if(f.guardBreak>0)f.guard=false;if(f.bleed>0){let old=Math.ceil(f.bleed/800);f.bleed=Math.max(0,f.bleed-dt);if(Math.ceil(f.bleed/800)<old){f.hp=Math.max(0,f.hp-1);checkWin()}}if(f.attackTime===0&&f.isCPU&&f.guardBreak>0)f.guard=false;
-if(f.isCPU){f.ai+=dt;f.dir=t.x>f.x?1:-1;f.crouch=distPlaceholder(f,t);if(f.stun<=0&&f.attackTime<=0){let dist=Math.abs(t.x-f.x);if(dist>270){f.x+=f.dir*f.d.speed*.8*k}else if(dist>f.d.reach+25){f.x+=f.dir*f.d.speed*.65*k;if(f.ai>850){f.ai=0;shoot(f)}}else if(f.ai>650){f.ai=0;let r=Math.random();if(r<.38)attackButton(f,t,"P");else if(r<.76)attackButton(f,t,"K");else special(f,t)}else if(f.ai>450&&f.d.name==="住吉"){f.ai=0;f.guard=true;f.attackTime=420}}}
+if(f.isCPU){f.ai+=dt;f.dir=t.x>f.x?1:-1;f.crouch=!!(t.crouch&&Math.abs(t.x-f.x)<150&&f.ai%1200>800);if(f.stun<=0&&f.attackTime<=0){let dist=Math.abs(t.x-f.x);if(dist>270){f.x+=f.dir*f.d.speed*.8*k}else if(dist>f.d.reach+25){f.x+=f.dir*f.d.speed*.65*k;if(f.ai>850){f.ai=0;shoot(f)}}else if(f.ai>650){f.ai=0;let r=Math.random();if(r<.38)attackButton(f,t,"P");else if(r<.76)attackButton(f,t,"K");else special(f,t)}else if(f.ai>450&&f.d.name==="住吉"){f.ai=0;f.guard=true;f.attackTime=420}}}
 else if(f.stun<=0&&f.attackTime<=0){let move=axis;if(keys.left||keys.a)move=-1;if(keys.right||keys.d)move=1;if(move){f.x+=move*f.d.speed*k;f.dir=t.x>f.x?1:-1}if(keys.jump&&f.ground){f.vy=-9.5;f.ground=false;f.airAttackUsed=false}f.crouch=f.ground&&((f===p&&(axisY>.35||keys.arrowdown))||(f===e&&Math.abs(t.x-f.x)<125&&Math.random()<.002));f.guard=f.guardBreak<=0&&((f===p&&((f.dir>0&&axis<-.4)||(f.dir<0&&axis>.4)||(f.dir>0&&keys.a)||(f.dir<0&&keys.d)))||(f===e&&Math.abs(t.x-f.x)<f.d.reach+25&&f.ai%900>680))}
 if(!f.ground){f.y+=f.vy*k;f.vy+=.48*k;if(f.y>=425){f.y=425;f.vy=0;f.ground=true;f.airAttackUsed=false}}f.x=clamp(f.x,45,915)}
 function updateShots(dt){
