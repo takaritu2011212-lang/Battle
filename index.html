@@ -117,7 +117,7 @@ function shoot(f,forced=false){
  f.shotCool=q.cool;f.attackTime=155;f.attackKind="shot";f.comboWindow=0;say(f.d.name+"："+q.name+"！");
 }
 function special(f,t){const chained=f.comboWindow>0&&f.attackTime<120;if(!running||f.stun>0||f.attackTime>0&&!chained||f.cool>0&&!chained)return;let name=f.d.name;const powered=f.super>=100;if(powered)f.super=0;f.cool=(name==="私和"?560:760);f.attackTime=powered?420:190;f.attackKind=powered?"super":"special";f.comboWindow=0;if(name==="定峰"){f.x=clamp(t.x-f.dir*70,45,915);f.dir=t.x>f.x?1:-1;meleeEffect(f,t,13,100,"幻歩");return}if(name==="羽神ミナ"){meleeEffect(f,t,17,150,"死奥の鎖");return}if(name==="住吉"){f.guard=true;f.attackTime=520;f.guardMeter=Math.min(100,f.guardMeter+25);say("住吉：合理的迎撃！");return}if(name==="山中和也"){meleeEffect(f,t,21,105,"破鏡");if(Math.abs(t.x-f.x)<110)t.bleed=2400;return}if(name==="漆原"){f.guard=true;f.attackTime=0;shoot(f,true);return}if(name==="私和"){f.x=clamp(f.x+f.dir*95,45,915);meleeEffect(f,t,15,85,"瞬動");return}shoot(f,true)}
-function meleeEffect(f,t,dmg,range,label){if(Math.abs(t.x-f.x)<=range&&f.dir===(t.x>f.x?1:-1)){dmg=Math.round(dmg*(f.attackKind==="super"?1.8:1));if(t.focus>0){t.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));t.stun=0}else t.stun=230;t.hp=Math.max(0,t.hp-dmg);t.stun=t.focus>0?0:230;t.flash=140;t.x=clamp(t.x+f.dir*20,45,915);say(f.d.name+"："+label+"！");checkWin()}else say(f.d.name+"："+label+"！")}
+function meleeEffect(f,t,dmg,range,label){if(Math.abs(t.x-f.x)<=range&&f.dir===(t.x>f.x?1:-1)){dmg=Math.round(dmg*(f.attackKind==="super"?1.8:1));const armored=t.focus>0;if(armored){t.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4))}t.hp=Math.max(0,t.hp-dmg);t.stun=armored?0:230;t.flash=140;t.x=clamp(t.x+f.dir*20,45,915);say(f.d.name+"："+label+"！");checkWin()}else say(f.d.name+"："+label+"！")}
 function checkWin(){if(p.hp<=0||e.hp<=0){running=false;let winner=p.hp>0?p.d.name:e.d.name;$("resultText").textContent=winner+" WIN!";$("endPanel").classList.remove("hidden")}}
 function updateF(f,t,dt){let k=dt/16.67;f.anim+=dt;f.moveTimer=Math.max(0,f.moveTimer-dt);f.focus=Math.max(0,f.focus-dt);if(f.moveTimer===0&&f.attackTime===0)f.moveState=f.ground?"idle":"jump";f.cool=Math.max(0,f.cool-dt);f.shotCool=Math.max(0,f.shotCool-dt);f.stun=Math.max(0,f.stun-dt);f.attackTime=Math.max(0,f.attackTime-dt);f.flash=Math.max(0,f.flash-dt);f.comboWindow=Math.max(0,f.comboWindow-dt);f.guardBreak=Math.max(0,f.guardBreak-dt);if(!f.guard&&f.guardBreak<=0)f.guardMeter=Math.min(100,f.guardMeter+dt*.018);if(f.guardBreak>0)f.guard=false;if(f.bleed>0){let old=Math.ceil(f.bleed/800);f.bleed=Math.max(0,f.bleed-dt);if(Math.ceil(f.bleed/800)<old){f.hp=Math.max(0,f.hp-1);checkWin()}}if(f.attackTime===0&&f.isCPU)f.guard=false;
 if(f.isCPU){f.ai+=dt;f.dir=t.x>f.x?1:-1;if(f.stun<=0&&f.attackTime<=0){let dist=Math.abs(t.x-f.x);if(dist>270){f.x+=f.dir*f.d.speed*.8*k}else if(dist>f.d.reach+25){f.x+=f.dir*f.d.speed*.65*k;if(f.ai>850){f.ai=0;shoot(f)}}else if(f.ai>650){f.ai=0;let r=Math.random();if(r<.18)attackButton(f,t,"LP");else if(r<.34)attackButton(f,t,"MP");else if(r<.50)attackButton(f,t,"HP");else if(r<.66)attackButton(f,t,"LK");else if(r<.82)attackButton(f,t,"HK");else special(f,t)}else if(f.ai>450&&f.d.name==="住吉"){f.ai=0;f.guard=true;f.attackTime=420}}}
@@ -131,7 +131,7 @@ function updateShots(dt){
   if(s.type==="trap")s.vx*=.965;
   s.x+=s.vx*step;s.y+=s.vy*step;s.life-=dt;
   if(s.type==="return"&&s.turn&&Math.abs(s.x-s.owner.x)<22){shots.splice(i,1);continue}
-  if(Math.abs(s.x-target.x)<s.size+18&&Math.abs(s.y-(target.y-48))<44){
+  if(Math.abs(s.x-target.x)<s.size+18&&Math.abs(s.y-(target.y-48))<44&&(s.type!=="return"||s.hitCount===0)){
    let dmg=target.guard?Math.max(1,Math.ceil(s.damage*.5)):s.damage,armored=target.focus>0;
    if(armored){target.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));target.stun=0}
    else target.stun=target.guard?75:s.type==="heavy"?260:145;
@@ -139,7 +139,7 @@ function updateShots(dt){
    if(s.type==="heavy"||s.owner.d.name==="山中和也")target.bleed=Math.max(target.bleed,1600);
    target.x=clamp(target.x+(s.vx>0?1:-1)*(s.type==="heavy"?26:10),45,915);
    if(s.type==="pierce"&&s.hitCount<1){s.hitCount++;s.vx*=.82}
-   else if(s.type==="return"&&!s.turn){s.turn=true;s.vx=-s.vx}
+   else if(s.type==="return"&&!s.turn){s.hitCount=1;s.turn=true;s.vx=-s.vx}
    else if(s.type!=="return"){shots.splice(i,1)}
    checkWin();continue;
   }
@@ -157,15 +157,15 @@ function makeSprite(d){
  px(86,200,34,44,"#29364c");px(138,200,34,44,"#29364c");px(78,238,52,12,"#151c28");px(132,238,52,12,"#151c28");
  // jacket panels and pixel highlights
  px(122,126,12,78,"#e8dfcc");px(88,135,28,8,"#ffffff44");px(144,135,24,8,"#ffffff44");
- px(72,150,10,32,skin);px(174,150,10,32,skin);px(72,178,18,18,"#30394c");px(168,178,18,18,"#30394c");
+ px(72,150,10,32,skin);px(174,150,10,32,skin);px(72,178,18,18,"#30394c");px(168,178,18,18,"#30394c");\n // Fine pixel accents: eyes, brows, collar, seams, belt, gloves and shoe highlights.\n px(91,70,22,5,d.hair);px(145,70,22,5,d.hair);px(96,82,12,7,"#f7eee0");px(151,82,12,7,"#f7eee0");px(100,83,5,6,"#33485d");px(155,83,5,6,"#33485d");px(120,109,18,3,"#a66d68");\n px(82,124,96,5,"#ffffff55");px(82,194,96,5,"#1b2737");px(112,132,4,58,"#b8c4c9");px(138,132,4,58,"#b8c4c9");px(98,210,14,6,"#526174");px(146,210,14,6,"#526174");px(82,244,40,4,"#718094");px(134,244,40,4,"#718094");
  // Individual signature details and silhouettes
- if(d.name==="大塚蒼生"){px(176,128,26,8,"#8bd8ff");px(190,116,8,30,"#d5f6ff");px(90,26,74,8,"#111722")}
- if(d.name==="羽神ミナ"){px(42,138,28,6,"#d9b5ff");px(36,144,8,72,"#b995df");px(28,208,50,6,"#e8d5ff");px(172,132,22,10,"#d9b5ff")}
- if(d.name==="住吉"){px(68,126,18,82,"#b5cbd2");px(176,126,18,82,"#b5cbd2");px(88,120,80,8,"#d7e5e8")}
- if(d.name==="山中和也"){px(64,116,128,96,"#713f45");px(82,126,92,12,"#c26a68");px(88,204,36,42,"#24232a");px(136,204,36,42,"#24232a")}
- if(d.name==="私和"){px(92,116,72,10,"#9dffe1");px(64,142,18,48,"#b8f5dc");px(174,142,18,48,"#b8f5dc")}
- if(d.name==="定峰"){px(78,38,100,18,"#aebaff");px(66,134,16,72,"#8799d5");px(174,134,16,72,"#8799d5")}
- if(d.name==="漆原"){px(78,44,100,14,"#c2a96b");px(86,128,84,10,"#d9c48d");px(178,145,22,46,"#bca36b")}
+ if(d.name==="大塚蒼生"){px(176,128,26,8,"#8bd8ff");px(190,116,8,30,"#d5f6ff");px(90,26,74,8,"#111722");px(74,55,20,16,"#20232d");px(160,55,18,14,"#20232d")}
+ if(d.name==="羽神ミナ"){px(42,138,28,6,"#d9b5ff");px(36,144,8,72,"#b995df");px(28,208,50,6,"#e8d5ff");px(172,132,22,10,"#d9b5ff");px(70,24,20,54,"#292333");px(166,24,18,54,"#292333");px(38,150,8,8,"#f1d9ff");px(34,168,8,8,"#f1d9ff")}
+ if(d.name==="住吉"){px(68,126,18,82,"#b5cbd2");px(176,126,18,82,"#b5cbd2");px(88,120,80,8,"#d7e5e8");px(72,58,20,10,"#151a22");px(164,58,20,10,"#151a22");px(82,142,8,48,"#d7e5e8");px(166,142,8,48,"#d7e5e8")}
+ if(d.name==="山中和也"){px(64,116,128,96,"#713f45");px(82,126,92,12,"#c26a68");px(88,204,36,42,"#24232a");px(136,204,36,42,"#24232a");px(70,32,116,24,"#28252a");px(78,64,98,8,"#28252a");px(64,134,12,58,"#b96868");px(180,134,12,58,"#b96868")}
+ if(d.name==="私和"){px(92,116,72,10,"#9dffe1");px(64,142,18,48,"#b8f5dc");px(174,142,18,48,"#b8f5dc");px(68,38,18,52,"#222b2b");px(168,38,18,52,"#222b2b");px(84,204,38,8,"#9dffe1");px(136,204,38,8,"#9dffe1")}
+ if(d.name==="定峰"){px(78,38,100,18,"#aebaff");px(66,134,16,72,"#8799d5");px(174,134,16,72,"#8799d5");px(68,20,118,14,"#282b39");px(78,56,18,28,"#282b39");px(160,56,18,28,"#282b39");px(88,190,80,8,"#b7baff")}
+ if(d.name==="漆原"){px(78,44,100,14,"#c2a96b");px(86,128,84,10,"#d9c48d");px(178,145,22,46,"#bca36b");px(82,32,92,8,"#28251e");px(84,140,12,52,"#d9c48d");px(160,140,12,52,"#d9c48d")}
  return s;
 }
 function drawFighter(c,f,mini=false){
@@ -191,7 +191,7 @@ function drawFighter(c,f,mini=false){
  if(f.flash>0){c.globalAlpha=.3;c.fillStyle="#fff";c.fillRect(-w/2,-h,w,h);c.globalAlpha=1}
  c.restore();f._lastX=f.x;
 }
-function render(){ctx.clearRect(0,0,960,540);let g=ctx.createLinearGradient(0,0,0,540);g.addColorStop(0,"#aebdca");g.addColorStop(.65,"#d8d1bd");g.addColorStop(1,"#7d897f");ctx.fillStyle=g;ctx.fillRect(0,0,960,540);ctx.fillStyle="#8995a0";for(let i=0;i<12;i++){let x=i*86;ctx.fillRect(x,185+(i%4)*15,62,220)}ctx.fillStyle="#e5d8b8";ctx.fillRect(0,430,960,110);ctx.fillStyle="#58635f";ctx.fillRect(0,430,960,5);ctx.fillStyle="#3d4a52";ctx.fillRect(370,60,220,42);ctx.fillStyle="#f7e9c8";ctx.font="bold 18px monospace";ctx.textAlign="center";ctx.fillText("OTSUKA OFFICE",480,87);[p,e].forEach(f=>drawFighter(ctx,f));shots.forEach(s=>{ctx.fillStyle=s.color;ctx.shadowColor=s.color;ctx.shadowBlur=16;ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0});$("pBar").style.width=(p.hp/p.max*100)+"%";$("eBar").style.width=(e.hp/e.max*100)+"%";$("superFill").style.width=p.super+"%";$("comboHud").textContent=p.comboCount>1?p.comboCount+" HIT":""}
+function render(){ctx.clearRect(0,0,960,540);let g=ctx.createLinearGradient(0,0,0,540);g.addColorStop(0,"#aebdca");g.addColorStop(.65,"#d8d1bd");g.addColorStop(1,"#7d897f");ctx.fillStyle=g;ctx.fillRect(0,0,960,540);ctx.fillStyle="#8995a0";for(let i=0;i<12;i++){let x=i*86;ctx.fillRect(x,185+(i%4)*15,62,220)}ctx.fillStyle="#e5d8b8";ctx.fillRect(0,430,960,110);ctx.fillStyle="#58635f";ctx.fillRect(0,430,960,5);ctx.fillStyle="#3d4a52";ctx.fillRect(370,60,220,42);ctx.fillStyle="#f7e9c8";ctx.font="bold 18px monospace";ctx.textAlign="center";ctx.fillText("OTSUKA OFFICE",480,87);[p,e].forEach(f=>drawFighter(ctx,f));shots.forEach(s=>{ctx.fillStyle=s.color;ctx.strokeStyle=s.color;ctx.shadowColor=s.color;ctx.shadowBlur=12;ctx.lineWidth=3;ctx.beginPath();if(s.type==="heavy"){ctx.moveTo(s.x-s.size,s.y);ctx.lineTo(s.x,s.y-s.size*1.5);ctx.lineTo(s.x+s.size,s.y);ctx.lineTo(s.x,s.y+s.size*1.5);ctx.closePath();ctx.fill()}else if(s.type==="return"){ctx.arc(s.x,s.y,s.size,0,Math.PI*1.6);ctx.stroke()}else if(s.type==="trap"){ctx.arc(s.x,s.y,s.size+4,0,Math.PI*2);ctx.stroke();ctx.fill()}else if(s.type==="fast"){ctx.moveTo(s.x-s.size*2,s.y);ctx.lineTo(s.x+s.size,s.y);ctx.stroke()}else if(s.type==="homing"){ctx.moveTo(s.x,s.y-s.size);ctx.lineTo(s.x+s.size,s.y);ctx.lineTo(s.x,s.y+s.size);ctx.lineTo(s.x-s.size,s.y);ctx.closePath();ctx.fill()}else{ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill()}ctx.shadowBlur=0});$("pBar").style.width=(p.hp/p.max*100)+"%";$("eBar").style.width=(e.hp/e.max*100)+"%";$("superFill").style.width=p.super+"%";$("comboHud").textContent=p.comboCount>1?p.comboCount+" HIT":""}
 function loop(t){if(!running){render();return}let dt=Math.min(34,t-(last||t));last=t;updateF(p,e,dt);updateF(e,p,dt);updateShots(dt);render();if(running)requestAnimationFrame(loop)}
 $("start").onclick=begin;$("back").onclick=()=>{running=false;$("game").classList.add("hidden");$("selectPanel").classList.remove("hidden")};$("rematch").onclick=begin;$("toSelect").onclick=()=>{$("endPanel").classList.add("hidden");$("game").classList.add("hidden");$("selectPanel").classList.remove("hidden");round=1};
 $("fullscreen").onclick=()=>{let el=document.documentElement;if(!document.fullscreenElement&&el.requestFullscreen)el.requestFullscreen().catch(()=>{});if(screen.orientation&&screen.orientation.lock)screen.orientation.lock("landscape").catch(()=>{})};
