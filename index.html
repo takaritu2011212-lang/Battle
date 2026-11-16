@@ -78,7 +78,7 @@ function attackButton(f,t,code){
  const routeMap={"大塚蒼生":"LP,MP,HP","羽神ミナ":"LP,MP,HK","住吉":"LP,MP,HK","山中和也":"LP,MP,HP","私和":"LK,MK,HK","定峰":"LP,MP,HK","漆原":"LP,MP,HP"};
  const routeHit=route===routeMap[f.d.name];if(routeHit){f.super=Math.min(100,f.super+20);f.comboBuffer=[];say(f.d.name+" 固有コンボ！");}
  const rank=m[0],base=rank==="weak"?f.d.weak:rank==="medium"?Math.round(f.d.weak*1.35):f.d.strong;
- const damage=Math.max(1,Math.round(base*m[1]*(chained?.9:1)*(!f.ground?.82:1)));
+ const damage=Math.max(1,Math.round(base*m[1]*(chained ? 0.9 : 1)*(f.ground ? 1 : 0.82)));
  const reach=f.d.reach*(rank==="weak"?.92:rank==="medium"?1.04:1.13);
  f.attackKind=code;f.attackTime=rank==="weak"?175:rank==="medium"?230:300;f.cool=rank==="weak"?280:rank==="medium"?430:610;f.comboWindow=rank==="heavy"?0:660;f.moveState="attack";f.moveTimer=f.attackTime;
  if(!f.ground)f.airAttackUsed=true;
@@ -141,50 +141,18 @@ function makeSprite(d){
  return s;
 }
 function drawFighter(c,f,mini=false){
- const x=f.x,y=f.y,scale=mini?.72:1,phase=f.anim/95;
+ const x=f.x,y=f.y,phase=f.anim/95;
  if(!spriteCache[f.d.name])spriteCache[f.d.name]=makeSprite(f.d);
  const moving=f.isCPU?Math.abs(f.x-(f._lastX??f.x))>.15:Math.abs(axis)>.1||keys.a||keys.d;
  const jumping=!f.ground,attack=f.attackTime>0&&!f.guard;
- c.save();c.translate(x,y);c.scale(f.dir,1);
- const bob=moving?Math.sin(phase*2)*3:Math.sin(phase)*1.2;
  const w=mini?64:112,h=mini?60:148;
- c.imageSmoothingEnabled=false;
+ c.save();c.translate(x,y);c.scale(f.dir,1);c.imageSmoothingEnabled=false;
+ const bob=moving?Math.sin(phase*2)*3:Math.sin(phase)*1.2;
  c.drawImage(spriteCache[f.d.name],-w/2,-h+bob,w,h);
  if(jumping){c.fillStyle="#dff5ff88";c.fillRect(-w*.48,-h-8,w*.96,4)}
  if(f.guard){c.strokeStyle="#9fe5ff";c.lineWidth=3;c.strokeRect(-w*.42,-h-3,w*.84,h+4)}
- if(attack){c.fillStyle=f.attackKind==="special"?"#ffe08a":"#fff4d0";c.fillRect(24,-h*.55,attack?38:12,6)}
+ if(attack){c.fillStyle=f.attackKind==="special"?"#ffe08a":"#fff4d0";c.fillRect(24,-h*.55,38,6)}
  if(f.flash>0){c.globalAlpha=.3;c.fillStyle="#fff";c.fillRect(-w/2,-h,w,h);c.globalAlpha=1}
- c.restore();f._lastX=f.x;return;
- const moving=f.isCPU?Math.abs(f.x-(f._lastX??f.x))>.15:Math.abs(axis)>.1||keys.a||keys.d;
- const airborne=!f.ground,attacking=f.attackTime>0&&!f.guard,blocking=f.guard;
- const swing=Math.sin(phase)* (moving?5:1),body=f.d.color;
- c.save();c.translate(x,y);c.scale(f.dir,1);
- c.fillStyle="#3338";c.fillRect(-20*scale,0,40*scale,5*scale);
- let legA=airborne?-12:swing,legB=airborne?8:-swing;
- if(f.d.name==="山中和也"){legA*=.65;legB*=.65}
- c.fillStyle="#29364c";c.fillRect((-12+legA*.35)*scale,-32*scale,10*scale,(32+Math.max(0,-legA))*scale);c.fillRect((3+legB*.35)*scale,-32*scale,10*scale,(32+Math.max(0,-legB))*scale);
- const col=f.flash>0?"#fff":body;
- c.fillStyle=col;
- if(f.d.name==="山中和也")c.fillRect(-19*scale,-78*scale,38*scale,48*scale);
- else c.fillRect(-15*scale,-75*scale,30*scale,45*scale);
- c.fillStyle=col;
- let armX=attacking?37:blocking?7:20,armY=attacking?-66:blocking?-82:-70;
- if(f.d.name==="羽神ミナ"){armX=attacking?48:24;armY=attacking?-60:-68}
- if(f.d.name==="住吉"){armX=blocking?18:attacking?34:13;armY=blocking?-91:-67}
- if(f.d.name==="山中和也"){armX=attacking?34:22;armY=attacking?-58:-68}
- if(f.d.name==="私和"){armX=attacking?42:16;armY=attacking?-75:-72}
- if(f.d.name==="定峰"){armX=attacking?38:24;armY=attacking?-83:-65}
- if(f.d.name==="漆原"){armX=attacking?34:19;armY=attacking?-63:-73}
- c.fillRect(-21*scale,-70*scale,7*scale,29*scale);
- c.fillRect(armX*scale,armY*scale,7*scale,25*scale);
- c.fillStyle="#e7b995";c.fillRect(-12*scale,-101*scale,24*scale,25*scale);
- c.fillStyle=f.d.hair;c.fillRect(-14*scale,-105*scale,28*scale,10*scale);c.fillRect(-16*scale,-99*scale,6*scale,15*scale);c.fillRect(10*scale,-100*scale,6*scale,12*scale);
- c.fillStyle="#25232a";c.fillRect(5*scale,-93*scale,3*scale,3*scale);
- if(f.d.name==="羽神ミナ"){c.strokeStyle="#d9b5ff";c.lineWidth=3*scale;c.beginPath();c.moveTo(armX*scale,(armY+18)*scale);c.quadraticCurveTo(58*scale,-28*scale,attacking?88*scale:40*scale,-55*scale);c.stroke()}
- if(f.d.name==="大塚蒼生"&&attacking){c.strokeStyle="#8bd8ff";c.lineWidth=3*scale;c.beginPath();c.arc(35*scale,-65*scale,20*scale,-1.2,1.1);c.stroke()}
- if(f.d.name==="山中和也"&&attacking){c.fillStyle="#e75d62";c.fillRect(35*scale,-58*scale,24*scale,5*scale)}
- if(blocking){c.strokeStyle="#9fe5ff";c.lineWidth=4*scale;c.strokeRect(-26*scale,-108*scale,52*scale,112*scale)}
- if(attacking){c.fillStyle=f.attackKind==="special"?"#ffe08a":"#fff4d0";c.fillRect(armX*scale,(armY+18)*scale,attacking?30*scale:12*scale,5*scale)}
  c.restore();f._lastX=f.x;
 }
 function render(){ctx.clearRect(0,0,960,540);let g=ctx.createLinearGradient(0,0,0,540);g.addColorStop(0,"#aebdca");g.addColorStop(.65,"#d8d1bd");g.addColorStop(1,"#7d897f");ctx.fillStyle=g;ctx.fillRect(0,0,960,540);ctx.fillStyle="#8995a0";for(let i=0;i<12;i++){let x=i*86;ctx.fillRect(x,185+(i%4)*15,62,220)}ctx.fillStyle="#e5d8b8";ctx.fillRect(0,430,960,110);ctx.fillStyle="#58635f";ctx.fillRect(0,430,960,5);ctx.fillStyle="#3d4a52";ctx.fillRect(370,60,220,42);ctx.fillStyle="#f7e9c8";ctx.font="bold 18px monospace";ctx.textAlign="center";ctx.fillText("OTSUKA OFFICE",480,87);[p,e].forEach(f=>drawFighter(ctx,f));shots.forEach(s=>{ctx.fillStyle=s.color;ctx.shadowColor=s.color;ctx.shadowBlur=16;ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0});$("pBar").style.width=(p.hp/p.max*100)+"%";$("eBar").style.width=(e.hp/e.max*100)+"%";$("superFill").style.width=p.super+"%";$("comboHud").textContent=p.comboCount>1?p.comboCount+" HIT":""}
