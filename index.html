@@ -78,7 +78,7 @@ function attackButton(f,t,code){
  const routeMap={"大塚蒼生":"LP,MP,HP","羽神ミナ":"LP,MP,HK","住吉":"LP,MP,HK","山中和也":"LP,MP,HP","私和":"LK,MK,HK","定峰":"LP,MP,HK","漆原":"LP,MP,HP"};
  const routeHit=route===routeMap[f.d.name];if(routeHit){f.super=Math.min(100,f.super+20);f.comboBuffer=[];say(f.d.name+" 固有コンボ！");}
  const rank=m[0],base=rank==="weak"?f.d.weak:rank==="medium"?Math.round(f.d.weak*1.35):f.d.strong;
- const damage=Math.max(1,Math.round(base*m[1]*(chained ? 0.9 : 1)*(f.ground ? 1 : 0.82)));
+ const damage=Math.max(1,Math.round(base*m[1]*(chained ? 0.9 : 1)*(f.ground ? 1 : 0.82)*(routeHit?1.3:1)));
  const reach=f.d.reach*(rank==="weak"?.92:rank==="medium"?1.04:1.13);
  f.attackKind=code;f.attackTime=rank==="weak"?175:rank==="medium"?230:300;f.cool=rank==="weak"?280:rank==="medium"?430:610;f.comboWindow=rank==="heavy"?0:660;f.moveState="attack";f.moveTimer=f.attackTime;
  if(!f.ground)f.airAttackUsed=true;
@@ -120,10 +120,32 @@ function special(f,t){const chained=f.comboWindow>0&&f.attackTime<120;if(!runnin
 function meleeEffect(f,t,dmg,range,label){if(Math.abs(t.x-f.x)<=range&&f.dir===(t.x>f.x?1:-1)){dmg=Math.round(dmg*(f.attackKind==="super"?1.8:1));if(t.focus>0){t.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));t.stun=0}else t.stun=230;t.hp=Math.max(0,t.hp-dmg);t.stun=t.focus>0?0:230;t.flash=140;t.x=clamp(t.x+f.dir*20,45,915);say(f.d.name+"："+label+"！");checkWin()}else say(f.d.name+"："+label+"！")}
 function checkWin(){if(p.hp<=0||e.hp<=0){running=false;let winner=p.hp>0?p.d.name:e.d.name;$("resultText").textContent=winner+" WIN!";$("endPanel").classList.remove("hidden")}}
 function updateF(f,t,dt){let k=dt/16.67;f.anim+=dt;f.moveTimer=Math.max(0,f.moveTimer-dt);f.focus=Math.max(0,f.focus-dt);if(f.moveTimer===0&&f.attackTime===0)f.moveState=f.ground?"idle":"jump";f.cool=Math.max(0,f.cool-dt);f.shotCool=Math.max(0,f.shotCool-dt);f.stun=Math.max(0,f.stun-dt);f.attackTime=Math.max(0,f.attackTime-dt);f.flash=Math.max(0,f.flash-dt);f.comboWindow=Math.max(0,f.comboWindow-dt);f.guardBreak=Math.max(0,f.guardBreak-dt);if(!f.guard&&f.guardBreak<=0)f.guardMeter=Math.min(100,f.guardMeter+dt*.018);if(f.guardBreak>0)f.guard=false;if(f.bleed>0){let old=Math.ceil(f.bleed/800);f.bleed=Math.max(0,f.bleed-dt);if(Math.ceil(f.bleed/800)<old){f.hp=Math.max(0,f.hp-1);checkWin()}}if(f.attackTime===0&&f.isCPU)f.guard=false;
-if(f.isCPU){f.ai+=dt;f.dir=t.x>f.x?1:-1;if(f.stun<=0&&f.attackTime<=0){let dist=Math.abs(t.x-f.x);if(dist>270){f.x+=f.dir*f.d.speed*.8*k}else if(dist>f.d.reach+25){f.x+=f.dir*f.d.speed*.65*k;if(f.ai>850){f.ai=0;shoot(f)}}else if(f.ai>650){f.ai=0;let r=Math.random();if(r<.34)melee(f,t,"weak");else if(r<.68)melee(f,t,"strong");else special(f,t)}else if(f.ai>450&&f.d.name==="住吉"){f.ai=0;f.guard=true;f.attackTime=420}}}
+if(f.isCPU){f.ai+=dt;f.dir=t.x>f.x?1:-1;if(f.stun<=0&&f.attackTime<=0){let dist=Math.abs(t.x-f.x);if(dist>270){f.x+=f.dir*f.d.speed*.8*k}else if(dist>f.d.reach+25){f.x+=f.dir*f.d.speed*.65*k;if(f.ai>850){f.ai=0;shoot(f)}}else if(f.ai>650){f.ai=0;let r=Math.random();if(r<.18)attackButton(f,t,"LP");else if(r<.34)attackButton(f,t,"MP");else if(r<.50)attackButton(f,t,"HP");else if(r<.66)attackButton(f,t,"LK");else if(r<.82)attackButton(f,t,"HK");else special(f,t)}else if(f.ai>450&&f.d.name==="住吉"){f.ai=0;f.guard=true;f.attackTime=420}}}
 else if(f.stun<=0&&f.attackTime<=0){let move=axis;if(keys.left||keys.a)move=-1;if(keys.right||keys.d)move=1;if(move){f.x+=move*f.d.speed*k;f.dir=t.x>f.x?1:-1}if(keys.jump&&f.ground){f.vy=-9.5;f.ground=false;f.airAttackUsed=false}f.guard=guard&&f.guardBreak<=0}
 if(!f.ground){f.y+=f.vy*k;f.vy+=.48*k;if(f.y>=425){f.y=425;f.vy=0;f.ground=true;f.airAttackUsed=false}}f.x=clamp(f.x,45,915)}
-function updateShots(dt){for(let i=shots.length-1;i>=0;i--){let s=shots[i];s.x+=s.vx*dt/16.67;s.life-=dt;let target=s.owner===p?e:p;if(Math.abs(s.x-target.x)<s.size+16&&Math.abs(s.y-(target.y-48))<42){let dmg=target.guard?Math.max(1,Math.ceil(s.damage*.5)):s.damage;if(target.focus>0){target.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));target.stun=0}else target.stun=target.guard?75:145;target.hp=Math.max(0,target.hp-dmg);target.flash=110;s.owner.super=Math.min(100,s.owner.super+dmg*.55);if(s.owner.d.name==="山中和也")target.bleed=1600;shots.splice(i,1);checkWin();continue}if(s.life<=0||s.x<0||s.x>960)shots.splice(i,1)}}
+function updateShots(dt){
+ for(let i=shots.length-1;i>=0;i--){
+  const s=shots[i],target=s.owner===p?e:p,step=dt/16.67;
+  if(s.type==="homing"){const dy=(target.y-48)-s.y;s.vy=clamp(s.vy+dy*.006,-1.8,1.8)}
+  if(s.type==="return"&&s.life<78&&!s.turn){s.vx=-s.vx;s.turn=true}
+  if(s.type==="trap")s.vx*=.965;
+  s.x+=s.vx*step;s.y+=s.vy*step;s.life-=dt;
+  if(s.type==="return"&&s.turn&&Math.abs(s.x-s.owner.x)<22){shots.splice(i,1);continue}
+  if(Math.abs(s.x-target.x)<s.size+18&&Math.abs(s.y-(target.y-48))<44){
+   let dmg=target.guard?Math.max(1,Math.ceil(s.damage*.5)):s.damage,armored=target.focus>0;
+   if(armored){target.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));target.stun=0}
+   else target.stun=target.guard?75:s.type==="heavy"?260:145;
+   target.hp=Math.max(0,target.hp-dmg);target.flash=110;s.owner.super=Math.min(100,s.owner.super+dmg*.55);
+   if(s.type==="heavy"||s.owner.d.name==="山中和也")target.bleed=Math.max(target.bleed,1600);
+   target.x=clamp(target.x+(s.vx>0?1:-1)*(s.type==="heavy"?26:10),45,915);
+   if(s.type==="pierce"&&s.hitCount<1){s.hitCount++;s.vx*=.82}
+   else if(s.type==="return"&&!s.turn){s.turn=true;s.vx=-s.vx}
+   else if(s.type!=="return"){shots.splice(i,1)}
+   checkWin();continue;
+  }
+  if(s.life<=0||s.x<0||s.x>960||s.y<250||s.y>450)shots.splice(i,1);
+ }
+}
 function makeSprite(d){
  const s=document.createElement("canvas");s.width=256;s.height=256;const g=s.getContext("2d");g.imageSmoothingEnabled=false;
  const px=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
@@ -151,13 +173,21 @@ function drawFighter(c,f,mini=false){
  if(!spriteCache[f.d.name])spriteCache[f.d.name]=makeSprite(f.d);
  const moving=f.isCPU?Math.abs(f.x-(f._lastX??f.x))>.15:Math.abs(axis)>.1||keys.a||keys.d;
  const jumping=!f.ground,attack=f.attackTime>0&&!f.guard;
- const w=mini?64:112,h=mini?60:148;
- c.save();c.translate(x,y);c.scale(f.dir,1);c.imageSmoothingEnabled=false;
- const bob=moving?Math.sin(phase*2)*3:Math.sin(phase)*1.2;
- c.drawImage(spriteCache[f.d.name],-w/2,-h+bob,w,h);
+ const w=mini?64:112,h=mini?60:148,bob=moving?Math.sin(phase*2)*3:Math.sin(phase)*1.2;
+ c.save();c.translate(x+(attack?7:0),y+bob);c.scale(f.dir,1);c.imageSmoothingEnabled=false;
+ if(attack&&f.d.name==="山中和也")c.rotate(-.075);
+ else if(attack&&f.d.name==="私和")c.rotate(-.11);
+ else if(attack&&f.d.name==="羽神ミナ")c.rotate(-.045);
+ c.drawImage(spriteCache[f.d.name],-w/2,-h,w,h);
  if(jumping){c.fillStyle="#dff5ff88";c.fillRect(-w*.48,-h-8,w*.96,4)}
  if(f.guard){c.strokeStyle="#9fe5ff";c.lineWidth=3;c.strokeRect(-w*.42,-h-3,w*.84,h+4)}
- if(attack){c.fillStyle=f.attackKind==="special"?"#ffe08a":"#fff4d0";c.fillRect(24,-h*.55,38,6)}
+ if(attack){
+  c.fillStyle=f.attackKind==="special"||f.attackKind==="super"?"#ffe08a":"#fff4d0";
+  c.fillRect(24,-h*.55,38,6);
+  if(f.d.name==="大塚蒼生"){c.strokeStyle="#8bd8ff";c.lineWidth=3;c.beginPath();c.arc(28,-h*.56,26,-1.3,1.1);c.stroke()}
+  if(f.d.name==="羽神ミナ"){c.strokeStyle="#d9b5ff";c.lineWidth=4;c.beginPath();c.moveTo(18,-h*.52);c.quadraticCurveTo(62,-h*.8,82,-h*.6);c.stroke()}
+  if(f.d.name==="山中和也"){c.fillStyle="#e75d62";c.fillRect(35,-h*.46,34,7)}
+ }
  if(f.flash>0){c.globalAlpha=.3;c.fillStyle="#fff";c.fillRect(-w/2,-h,w,h);c.globalAlpha=1}
  c.restore();f._lastX=f.x;
 }
