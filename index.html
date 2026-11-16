@@ -53,13 +53,13 @@ h1{font-size:clamp(22px,4vw,34px);margin:2px 0 4px}.sub{color:#aab8ce;font-size:
 </section>
 <script>
 const cast=[
-{name:"大塚蒼生",role:"万能・アーティファクト",color:"#425879",hair:"#20232d",speed:4.2,hp:100,reach:76,weak:7,strong:13,shot: {name:"時空弾",damage:11,speed:8,size:9,color:"#8bd8ff",cool:780},special:"時空の一閃",passive:"連続攻撃の硬直が短い",routes:["弱P→中P→強P","弱K→中K→時空弾"]},
-{name:"羽神ミナ",role:"技巧・鎖",color:"#76518c",hair:"#292333",speed:3.9,hp:94,reach:115,weak:6,strong:11,shot:{name:"鎖撃",damage:9,speed:7,size:7,color:"#d9b5ff",cool:700},special:"死奥の鎖",passive:"近接攻撃のリーチが長い",routes:["弱P→中P→鎖撃","中K→強K→死奥の鎖"]},
-{name:"住吉",role:"迎撃・カウンター",color:"#667d88",hair:"#20252b",speed:3.5,hp:108,reach:86,weak:8,strong:14,shot:{name:"牽制刃",damage:8,speed:9,size:6,color:"#d8edf0",cool:860},special:"合理的迎撃",passive:"ガード中の被ダメージを大幅軽減",routes:["弱P→中P→合理的迎撃","中K→強K→牽制刃"]},
-{name:"山中和也",role:"重量・パワー",color:"#925454",hair:"#28252a",speed:2.9,hp:120,reach:92,weak:9,strong:18,shot:{name:"血刃",damage:10,speed:6,size:10,color:"#e75d62",cool:950},special:"破鏡",passive:"特殊技に出血効果",routes:["弱P→中P→破鏡","弱K→中K→血刃"]},
-{name:"私和",role:"高速・回避",color:"#4b8878",hair:"#222b2b",speed:5.3,hp:88,reach:72,weak:6,strong:10,shot:{name:"風切",damage:7,speed:11,size:6,color:"#9dffe1",cool:590},special:"瞬動",passive:"移動速度が高く硬直が短い",routes:["弱K→中K→強K","弱P→中P→瞬動"]},
-{name:"定峰",role:"回避・攪乱",color:"#6578b0",hair:"#282b39",speed:4.7,hp:92,reach:80,weak:7,strong:11,shot:{name:"幻弾",damage:8,speed:8,size:8,color:"#b7baff",cool:660},special:"幻歩",passive:"特殊技で短距離ワープ",routes:["弱P→中P→幻歩","弱K→中K→幻弾"]},
-{name:"漆原",role:"経験・戦術",color:"#897a50",hair:"#28251e",speed:3.8,hp:102,reach:90,weak:8,strong:13,shot:{name:"牽制射",damage:9,speed:8,size:7,color:"#ffe39a",cool:720},special:"見切り",passive:"攻撃後の隙が小さい",routes:["弱P→中P→強P","中K→強K→見切り"]}
+{name:"大塚蒼生",role:"万能・アーティファクト",color:"#425879",hair:"#20232d",speed:4.2,hp:100,reach:76,weak:7,strong:13,shot: {name:"時空弾",damage:11,speed:8,size:9,color:"#8bd8ff",cool:780,type:"pierce"},special:"時空の一閃",passive:"連続攻撃の硬直が短い",routes:["弱P→中P→強P","弱K→中K→時空弾"]},
+{name:"羽神ミナ",role:"技巧・鎖",color:"#76518c",hair:"#292333",speed:3.9,hp:94,reach:115,weak:6,strong:11,shot:{name:"鎖撃",damage:9,speed:7,size:7,color:"#d9b5ff",cool:700,type:"return"},special:"死奥の鎖",passive:"近接攻撃のリーチが長い",routes:["弱P→中P→鎖撃","中K→強K→死奥の鎖"]},
+{name:"住吉",role:"迎撃・カウンター",color:"#667d88",hair:"#20252b",speed:3.5,hp:108,reach:86,weak:8,strong:14,shot:{name:"牽制刃",damage:8,speed:9,size:6,color:"#d8edf0",cool:860,type:"fast"},special:"合理的迎撃",passive:"ガード中の被ダメージを大幅軽減",routes:["弱P→中P→合理的迎撃","中K→強K→牽制刃"]},
+{name:"山中和也",role:"重量・パワー",color:"#925454",hair:"#28252a",speed:2.9,hp:120,reach:92,weak:9,strong:18,shot:{name:"血刃",damage:10,speed:6,size:10,color:"#e75d62",cool:950,type:"heavy"},special:"破鏡",passive:"特殊技に出血効果",routes:["弱P→中P→破鏡","弱K→中K→血刃"]},
+{name:"私和",role:"高速・回避",color:"#4b8878",hair:"#222b2b",speed:5.3,hp:88,reach:72,weak:6,strong:10,shot:{name:"風切",damage:7,speed:11,size:6,color:"#9dffe1",cool:590,type:"triple"},special:"瞬動",passive:"移動速度が高く硬直が短い",routes:["弱K→中K→強K","弱P→中P→瞬動"]},
+{name:"定峰",role:"回避・攪乱",color:"#6578b0",hair:"#282b39",speed:4.7,hp:92,reach:80,weak:7,strong:11,shot:{name:"幻弾",damage:8,speed:8,size:8,color:"#b7baff",cool:660,type:"homing"},special:"幻歩",passive:"特殊技で短距離ワープ",routes:["弱P→中P→幻歩","弱K→中K→幻弾"]},
+{name:"漆原",role:"経験・戦術",color:"#897a50",hair:"#28251e",speed:3.8,hp:102,reach:90,weak:8,strong:13,shot:{name:"牽制射",damage:9,speed:8,size:7,color:"#ffe39a",cool:720,type:"trap"},special:"見切り",passive:"攻撃後の隙が小さい",routes:["弱P→中P→強P","中K→強K→見切り"]}
 ];
 const $=id=>document.getElementById(id),canvas=$("arena"),ctx=canvas.getContext("2d");
 let selected=0,p=null,e=null,shots=[],running=false,last=0,keys={},stickPointer=null,axis=0,axisY=0,guard=false,round=1,hitEffects=[];const spriteCache={};
@@ -83,10 +83,10 @@ function attackButton(f,t,code){
  f.attackKind=code;f.attackTime=rank==="weak"?175:rank==="medium"?230:300;f.cool=rank==="weak"?280:rank==="medium"?430:610;f.comboWindow=rank==="heavy"?0:660;f.moveState="attack";f.moveTimer=f.attackTime;
  if(!f.ground)f.airAttackUsed=true;
  if(Math.abs(t.x-f.x)<=reach&&Math.abs(t.y-f.y)<125&&f.dir===(t.x>f.x?1:-1)){
-  let dmg=damage,blocked=t.guard&&t.guardBreak<=0;
-  if(t.focus>0){t.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));blocked=true;say("FOCUS ARMOR!");}
+  let dmg=damage,blocked=t.guard&&t.guardBreak<=0,armored=t.focus>0;
+  if(armored){t.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));blocked=true;say("FOCUS ARMOR!");}
   if(blocked&&t.guard){t.guardMeter=Math.max(0,t.guardMeter-(rank==="heavy"?38:rank==="medium"?27:17));dmg=Math.max(1,Math.ceil(dmg*(t.d.name==="住吉"?.2:.38)));if(t.guardMeter<=0){t.guard=false;t.guardBreak=1050;t.stun=820;dmg=Math.ceil(damage*1.25);say("GUARD CRUSH!");}}
-  t.hp=Math.max(0,t.hp-dmg);t.stun=t.focus>0?0:blocked?95:rank==="heavy"?285:rank==="medium"?205:145;t.flash=130;t.x=clamp(t.x+f.dir*(blocked?5:18),45,915);
+  t.hp=Math.max(0,t.hp-dmg);t.stun=armored?0:blocked?95:rank==="heavy"?285:rank==="medium"?205:145;t.flash=130;t.x=clamp(t.x+f.dir*(blocked?5:18),45,915);
   f.super=Math.min(100,f.super+dmg*.65);t.super=Math.min(100,t.super+dmg*.25);f.comboCount=chained?f.comboCount+1:1;
   if(f.comboCount>1)say(f.comboCount+" HIT COMBO");hitEffects.push({x:t.x,y:t.y-60,life:190,color:"#ffe6a0"});checkWin();
  }
@@ -109,7 +109,13 @@ function melee(f,t,kind){
   checkWin();
  }
 }
-function shoot(f,forced=false){if(!running||f.shotCool>0||f.stun>0||(f.attackTime>0&&!forced))return;let q=f.d.shot;shots.push({x:f.x+f.dir*25,y:f.y-65,vx:f.dir*q.speed,damage:Math.round(q.damage*(f.attackKind==="super"?1.8:1)),size:q.size*(f.attackKind==="super"?1.5:1),color:q.color,owner:f,life:150});f.shotCool=q.cool;f.attackTime=155;f.attackKind="shot";f.comboWindow=0;say(f.d.name+"："+q.name+"！")}
+function shoot(f,forced=false){
+ if(!running||f.shotCool>0||f.stun>0||(f.attackTime>0&&!forced))return;
+ const q=f.d.shot,type=q.type||"normal",superBoost=f.attackKind==="super"?1.8:1;
+ const spawn=(vy=0,offset=0)=>shots.push({x:f.x+f.dir*25,y:f.y-65+offset,vx:f.dir*q.speed,vy,damage:Math.round(q.damage*superBoost),size:q.size*(superBoost>1?1.5:1),color:q.color,owner:f,life:type==="trap"?240:150,type,hitCount:0,turn:false});
+ if(type==="triple"){spawn(-1.05,-9);spawn(0,0);spawn(1.05,9)}else spawn();
+ f.shotCool=q.cool;f.attackTime=155;f.attackKind="shot";f.comboWindow=0;say(f.d.name+"："+q.name+"！");
+}
 function special(f,t){const chained=f.comboWindow>0&&f.attackTime<120;if(!running||f.stun>0||f.attackTime>0&&!chained||f.cool>0&&!chained)return;let name=f.d.name;const powered=f.super>=100;if(powered)f.super=0;f.cool=(name==="私和"?560:760);f.attackTime=powered?420:190;f.attackKind=powered?"super":"special";f.comboWindow=0;if(name==="定峰"){f.x=clamp(t.x-f.dir*70,45,915);f.dir=t.x>f.x?1:-1;meleeEffect(f,t,13,100,"幻歩");return}if(name==="羽神ミナ"){meleeEffect(f,t,17,150,"死奥の鎖");return}if(name==="住吉"){f.guard=true;f.attackTime=520;f.guardMeter=Math.min(100,f.guardMeter+25);say("住吉：合理的迎撃！");return}if(name==="山中和也"){meleeEffect(f,t,21,105,"破鏡");if(Math.abs(t.x-f.x)<110)t.bleed=2400;return}if(name==="漆原"){f.guard=true;f.attackTime=0;shoot(f,true);return}if(name==="私和"){f.x=clamp(f.x+f.dir*95,45,915);meleeEffect(f,t,15,85,"瞬動");return}shoot(f,true)}
 function meleeEffect(f,t,dmg,range,label){if(Math.abs(t.x-f.x)<=range&&f.dir===(t.x>f.x?1:-1)){dmg=Math.round(dmg*(f.attackKind==="super"?1.8:1));if(t.focus>0){t.focus=0;dmg=Math.max(1,Math.ceil(dmg*.4));t.stun=0}else t.stun=230;t.hp=Math.max(0,t.hp-dmg);t.stun=t.focus>0?0:230;t.flash=140;t.x=clamp(t.x+f.dir*20,45,915);say(f.d.name+"："+label+"！");checkWin()}else say(f.d.name+"："+label+"！")}
 function checkWin(){if(p.hp<=0||e.hp<=0){running=false;let winner=p.hp>0?p.d.name:e.d.name;$("resultText").textContent=winner+" WIN!";$("endPanel").classList.remove("hidden")}}
