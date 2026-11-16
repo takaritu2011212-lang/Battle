@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+:root{color-scheme:dark;--cyan:#75e7ff;--gold:#f0cb80;--ink:#07101d;--muted:#9aacc4}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#080e19;color:#eef5ff;font-family:system-ui,"Noto Sans JP",sans-serif}
+body{padding:clamp(10px,2.4vw,26px);background:radial-gradient(ellipse at 50% -15%,#294668 0,#111d30 42%,#070b13 100%)}
+button{font:inherit;cursor:pointer}
+.shell{width:min(1240px,100%);margin:auto}
+.header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 15px}
+.brand{display:flex;align-items:center;gap:13px}
+.emblem{width:44px;height:44px;display:grid;place-items:center;border:1px solid #6485ad;border-radius:11px;background:linear-gradient(145deg,#254568,#111c2d);font:700 25px Rajdhani;color:var(--cyan);box-shadow:0 0 26px #58cfff22}
+.kicker{font:700 11px Rajdhani;letter-spacing:.25em;color:var(--cyan)}
+h1{font-size:clamp(16px,2vw,21px);letter-spacing:.12em;margin:1px 0}
+.headnote{text-align:right;color:#8fa5c3;font:600 10px Rajdhani;letter-spacing:.12em;line-height:1.6}
+.stage{position:relative;overflow:hidden;border:1px solid #3b5678;border-radius:15px;background:#091321;box-shadow:0 24px 65px #0009,0 0 0 1px #9cd9ff12 inset}
+#motionView{display:block;width:100%;height:auto;aspect-ratio:16/9}
+.hud{position:absolute;inset:14px 16px auto;display:flex;justify-content:space-between;pointer-events:none}
+.hudTag{border:1px solid #8daed344;border-radius:5px;padding:6px 9px;background:#071322b8;color:#cbdcf1;font:700 10px Rajdhani;letter-spacing:.16em;backdrop-filter:blur(6px)}
+.hudTag b{color:var(--cyan)}
+.stageCaption{position:absolute;left:18px;right:18px;bottom:14px;display:flex;align-items:end;justify-content:space-between;pointer-events:none;text-shadow:0 2px 8px #000}
+.fighterName{font-size:clamp(20px,3vw,31px);font-weight:900;letter-spacing:.1em}
+.fighterName small{display:block;font:700 10px Rajdhani;letter-spacing:.25em;color:var(--cyan);margin-bottom:3px}
+.motionState{text-align:right;font:700 11px Rajdhani;letter-spacing:.15em;color:#e3efff}
+.panel{margin-top:13px;padding:15px;border:1px solid #2b405d;border-radius:12px;background:linear-gradient(145deg,#15243aee,#0d1727ee);box-shadow:0 12px 34px #0005}
+.panelHead{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:11px}
+.panelHead strong{font:700 12px Rajdhani;letter-spacing:.2em}
+.panelHead span{font-size:10px;color:var(--muted)}
+.motionGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+.motionButton{min-height:53px;text-align:left;padding:8px 10px;border:1px solid #344a68;border-radius:8px;background:#101d30;color:#eef5ff;transition:transform .15s,border-color .15s,background .15s}
+.motionButton:hover{border-color:#79dff5;transform:translateY(-1px)}
+.motionButton.active{border-color:var(--cyan);background:linear-gradient(130deg,#17415a,#14263d);box-shadow:0 0 0 1px #75e7ff24 inset}
+.motionButton b{display:block;font-size:12px}
+.motionButton small{display:block;margin-top:3px;color:#91a9c6;font:700 9px Rajdhani;letter-spacing:.16em}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.tool{border:1px solid #3a5272;border-radius:7px;background:#0d192a;color:#eaf4ff;padding:8px 12px;font-size:11px}
+.tool:hover{border-color:var(--cyan)}
+.tool.strong{background:#17394e;border-color:#4d9ab4}
+.speed{display:flex;align-items:center;gap:8px;color:#a8bad2;font-size:10px;margin-left:5px}
+input[type=range]{width:105px;accent-color:var(--cyan)}
+input[type=checkbox]{accent-color:var(--cyan)}
+.readout{margin-left:auto;color:#a9bdd8;font:700 10px Rajdhani;letter-spacing:.12em}
+.progress{height:3px;margin-top:12px;background:#2b3c56;border-radius:5px;overflow:hidden}
+#progressFill{height:100%;width:0;background:linear-gradient(90deg,#4d8dff,#75e7ff);box-shadow:0 0 12px #75e7ff}
+.footer{display:flex;justify-content:space-between;gap:10px;margin:10px 2px 0;color:#788da9;font-size:10px;line-height:1.6}
+@media(max-width:680px){body{padding:9px}.headnote{display:none}.emblem{width:37px;height:37px}.hud{inset:8px 9px auto}.hudTag{font-size:8px;padding:5px 6px}.stageCaption{left:10px;right:10px;bottom:8px}.fighterName{font-size:18px}.fighterName small{font-size:8px}.motionState{font-size:8px}.panel{padding:10px;margin-top:9px}.motionGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.motionButton{min-height:46px;padding:7px}.motionButton b{font-size:11px}.motionButton small{font-size:8px}.panelHead span{font-size:9px}.toolbar{gap:6px}.tool{padding:7px 9px}.readout{width:100%;margin:0}.footer{font-size:9px}}
+@media(orientation:portrait) and (max-width:680px){.stage{margin-top:8px}.footer span:last-child{display:none}}
