@@ -1,0 +1,39 @@
+
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101521;color:#f4f0e7;font-family:system-ui,"Noto Sans JP",sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
+button{font:inherit;border:0;cursor:pointer}.hidden{display:none!important}
+#selectPanel{height:100dvh;overflow:auto;padding:14px;background:radial-gradient(ellipse at top,#293a53,#101521 70%)}
+h1{font-size:clamp(22px,4vw,34px);margin:2px 0 4px}.sub{color:#aab8ce;font-size:12px}
+#roster{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:9px;max-width:900px;margin:14px auto}
+.fighter{background:#26354b;color:#fff;border:1px solid #50627d;border-radius:10px;padding:7px;text-align:left;min-height:100px}.fighter.selected{outline:3px solid #efc56e;background:#394962}.fighter b,.fighter small{display:block}.fighter small{color:#c3cee0;font-size:11px}.fighter .stats{font-size:10px;color:#eacb88;margin-top:4px}
+#start{display:block;margin:12px auto;padding:13px 28px;border-radius:10px;background:#e8bd68;color:#1b2230;font-weight:900}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#111a27}
+#arena{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated}
+#hud{position:absolute;left:3%;right:3%;top:max(8px,env(safe-area-inset-top));display:flex;gap:14px;justify-content:space-between;pointer-events:none;text-shadow:0 2px 3px #000}
+.hudside{width:44%;max-width:440px}.hudside.right{text-align:right}.name{font-weight:900;font-size:clamp(12px,2.2vw,18px)}.meter{height:clamp(10px,1.8vh,16px);background:#492b37;border:1px solid #fff9;border-radius:4px;overflow:hidden;margin-top:3px}.fill{height:100%;width:100%;background:linear-gradient(90deg,#4bd07e,#a6e58a);transition:width .12s}
+#round{position:absolute;top:9%;left:50%;transform:translateX(-50%);font-weight:900;font-size:clamp(12px,2vw,17px);color:#ffe5a3;text-shadow:0 2px 4px #000;white-space:nowrap;pointer-events:none}
+#status{position:absolute;top:16%;left:50%;transform:translateX(-50%);font-size:clamp(13px,2.4vw,21px);font-weight:900;text-shadow:0 2px 4px #000;color:#fff0bd;white-space:nowrap;pointer-events:none}
+#controls{position:absolute;inset:0;pointer-events:none}
+#stickZone{position:absolute;left:max(14px,env(safe-area-inset-left));bottom:max(13px,env(safe-area-inset-bottom));width:clamp(112px,22vw,176px);height:clamp(112px,22vw,176px);border-radius:50%;background:#c9d8ef20;border:2px solid #e5efff50;backdrop-filter:blur(2px);pointer-events:auto;touch-action:none}
+#stickKnob{position:absolute;width:42%;height:42%;left:29%;top:29%;border-radius:50%;background:#e5bd6c99;border:2px solid #fff9;box-shadow:0 2px 10px #0005;pointer-events:none}
+#stickHint{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff65;font-size:10px;font-weight:800;pointer-events:none}
+#buttons{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));width:clamp(210px,39vw,310px);height:clamp(142px,27vw,190px);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:5px;pointer-events:auto}
+.action{border-radius:50%;background:#d6e2f02b;border:2px solid #f5f5f580;color:#fff;font-weight:900;font-size:clamp(11px,2vw,16px);text-shadow:0 1px 3px #000;backdrop-filter:blur(3px);box-shadow:0 3px 10px #0004;touch-action:none}
+.action:active,.action.pressed{background:#e5bd6c99;transform:scale(.96)}.action{font-size:clamp(9px,1.6vw,13px)}#btnSpecial{background:#a64c4c77;border-color:#ffc1a4a0}#btnFocus{background:#4b82a866;border-color:#a8d5ff99}#comboHud{position:absolute;left:50%;top:23%;transform:translateX(-50%);font-weight:1000;font-size:clamp(20px,4vw,34px);color:#ffe39a;text-shadow:0 3px 5px #000;pointer-events:none}#superWrap{position:absolute;left:3%;right:3%;bottom:7px;height:7px;border:1px solid #ffffff88;background:#111a;border-radius:5px;pointer-events:none}#superFill{height:100%;width:0;background:linear-gradient(90deg,#4aa9e8,#d4f5ff);border-radius:5px}#meterLabel{position:absolute;left:3%;bottom:16px;font-size:9px;color:#dcecff;text-shadow:0 1px 3px #000;pointer-events:none}@media(max-height:390px){#buttons{height:126px;width:220px;gap:3px}.action{font-size:9px}}
+#topButtons{position:absolute;right:10px;top:max(8px,env(safe-area-inset-top));display:flex;gap:6px;pointer-events:auto}
+.smallBtn{background:#111c2c99;border:1px solid #ffffff55;color:#fff;border-radius:7px;padding:6px 9px;font-size:11px;backdrop-filter:blur(4px)}
+#endPanel{position:absolute;inset:0;background:#080d18b8;display:grid;place-items:center;text-align:center}
+#endCard{background:#1c293b;border:1px solid #8290a8;border-radius:14px;padding:22px;min-width:220px}#endCard h2{margin:0 0 12px}
+@media(orientation:portrait){#game:after{content:"スマホを横向きにしてください";position:absolute;inset:0;background:#101521ed;display:grid;place-items:center;font-weight:900;font-size:20px;z-index:20}}
+@media(pointer:fine){#stickZone,#buttons{opacity:.62}}@media(max-height:390px){#stickZone{width:100px;height:100px}#buttons{height:106px;width:158px;gap:5px}.action{font-size:10px}#round{top:8%}#status{top:14%}}
+
+#moveGuide{max-width:900px;margin:8px auto;padding:12px;background:#172438;border:1px solid #52627a;border-radius:10px;display:grid;gap:5px;color:#dbe5f4;font-size:12px}
+#moveGuide span{color:#aebdd1}
+#buttons{grid-template-columns:repeat(2,minmax(68px,1fr));width:174px;height:112px;gap:6px}
+.action{font-size:12px}
+#selectPanel{padding-bottom:20px}
+#titleScreen{min-height:100dvh;display:grid;place-items:center;text-align:center;background:radial-gradient(ellipse at 50% 30%,#344d69,#101521 68%);padding:24px}
+.titleCard{width:min(720px,94vw);padding:36px 20px;border:1px solid #667d9c;background:#121e30dd;box-shadow:0 20px 70px #0008}
+.titleLogo{font-size:clamp(34px,8vw,72px);font-weight:1000;letter-spacing:.08em;color:#f0cb80;text-shadow:0 5px 0 #6b4828,0 10px 24px #000}
+.titleSub{letter-spacing:.22em;color:#aabbd0;margin:14px 0 30px}
+#titleStart{padding:15px 48px;background:#e8bd68;color:#1b2230;border-radius:6px;font-weight:900;font-size:18px}
+.titleFoot{margin-top:30px;color:#8798ad;font-size:11px}
