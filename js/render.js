@@ -29,25 +29,23 @@ function drawMotionFX(c,f,w,h,progress){
  const p=clamp(progress,0,1),pulse=Math.sin(p*Math.PI);
  c.save();c.globalAlpha=.28+.62*pulse;c.strokeStyle=color;c.fillStyle=color;c.lineWidth=3;
  if(style==="blade"){
-  c.beginPath();c.ellipse(w*.43,-h*.53,w*.28,h*.2,-.28,-1.25,1.05);c.stroke();
-  c.beginPath();c.moveTo(w*.28,-h*.42);c.lineTo(w*.72,-h*.64);c.stroke();
+  for(let i=0;i<7;i++)c.fillRect(w*(.28+i*.055),-h*(.48+i*.025),8,4);
+  c.fillRect(w*.68,-h*.68,5,12);
  }else if(style==="chain"){
-  c.beginPath();c.moveTo(w*.12,-h*.58);c.bezierCurveTo(w*.35,-h*.95,w*.55,-h*.22,w*.9,-h*.62);c.stroke();
-  for(let i=0;i<5;i++){const x=w*(.24+i*.13),y=-h*(.62+.12*Math.sin(i*.8+p*2));c.beginPath();c.arc(x,y,3,0,Math.PI*2);c.fill()}
+  for(let i=0;i<8;i++){const x=w*(.18+i*.095),y=-h*(.58+.13*Math.sin(i*.58+p*2));c.fillRect(x,y,5,5)}
  }else if(style==="guard"){
-  c.beginPath();c.arc(w*.35,-h*.52,w*.35,-1.35,1.2);c.stroke();
-  c.beginPath();c.moveTo(w*.4,-h*.86);c.lineTo(w*.66,-h*.5);c.lineTo(w*.4,-h*.16);c.stroke();
+  for(let i=0;i<9;i++){const a=-1.25+i*.28,x=w*.35+Math.cos(a)*w*.34,y=-h*.52+Math.sin(a)*h*.34;c.fillRect(x,y,7,7)}
+  c.fillRect(w*.38,-h*.86,5,12);c.fillRect(w*.62,-h*.52,5,12);c.fillRect(w*.38,-h*.2,5,12);
  }else if(style==="heavy"){
-  c.lineWidth=7;c.beginPath();c.moveTo(w*.22,-h*.35);c.lineTo(w*.85,-h*.78);c.stroke();
-  c.lineWidth=2;c.beginPath();c.moveTo(w*.3,-h*.2);c.lineTo(w*.95,-h*.63);c.stroke();
+  for(let i=0;i<7;i++){c.fillRect(w*(.24+i*.075),-h*(.35+i*.055),9,6);c.fillRect(w*(.3+i*.075),-h*(.2+i*.055),5,4)}
  }else if(style==="dash"){
-  for(let i=0;i<4;i++){c.globalAlpha=.2+i*.12;c.beginPath();c.moveTo(w*(.28+i*.08),-h*(.28+i*.1));c.lineTo(w*(.8+i*.08),-h*(.3+i*.1));c.stroke()}
+  for(let i=0;i<5;i++){c.globalAlpha=.2+i*.12;c.fillRect(w*(.22+i*.07),-h*(.28+i*.1),w*.34,4)}
  }else if(style==="afterimage"){
-  c.globalAlpha=.24;c.strokeRect(-w*.52,-h-2,w*1.04,h+4);
-  c.beginPath();c.arc(w*.55,-h*.52,w*.22,0,Math.PI*2);c.stroke();
+  c.globalAlpha=.24;c.fillRect(-w*.52,-h-2,4,h+4);c.fillRect(w*.48,-h-2,4,h+4);c.fillRect(-w*.52,-h-2,w*1.04,4);
+  for(let i=0;i<5;i++)c.fillRect(w*(.42+i*.025),-h*(.65+i*.025),4,4);
  }else if(style==="counter"){
-  c.beginPath();c.arc(w*.62,-h*.54,12+8*pulse,0,Math.PI*2);c.stroke();
-  c.beginPath();c.moveTo(w*.62-22,-h*.54);c.lineTo(w*.62+22,-h*.54);c.moveTo(w*.62,-h*.54-22);c.lineTo(w*.62,-h*.54+22);c.stroke();
+  c.fillRect(w*.62-22,-h*.54-2,44,4);c.fillRect(w*.62-2,-h*.54-22,4,44);
+  c.fillRect(w*.62-12,-h*.54-12,5,5);c.fillRect(w*.62+7,-h*.54+7,5,5);
  }
  c.restore();
 }
@@ -59,9 +57,9 @@ function drawFighter(c,f,mini=false){
  const w=mini?64:112,h=mini?60:148;
  let bob=0,lean=0,rotation=0,scaleX=1,scaleY=1,shift=0;
  if(f.stun>0){lean=-.18;rotation=-.09;bob=2}
- else if(jumping){lean=clamp(-(f.vy||0)*.012,-.12,.16);rotation=lean*.35;scaleX=1.03}
- else if(f.crouch){scaleY=.82;lean=.025}
- else if(f.guard){lean=-.035;scaleX=.97}
+ else if(jumping){lean=clamp(-(f.vy||0)*.012+(m.jumpLean||0),-.2,.22);rotation=lean*.35;scaleX=1+(m.jumpStretch||.03)}
+ else if(f.crouch){scaleY=m.crouchScale||.82;lean=m.crouchLean||.025}
+ else if(f.guard){lean=m.guardLean||-.035;scaleX=m.guardScale||.97}
  else if(attack){
   const progress=1-clamp((f.attackTime||0)/Math.max(1,f.motionDuration||220),0,1),pulse=Math.sin(progress*Math.PI);
   lean=(m.attackLean||-.08)*pulse;rotation=(m.rotation||-.04)*pulse;
