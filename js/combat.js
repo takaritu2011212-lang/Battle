@@ -30,7 +30,7 @@ function tryCommand(f,t,code){
  const seq=f.commandBuffer.map(v=>v.v).join("");
  if(code==="P"&&seq.endsWith("DF")){
   f.commandBuffer=[];f.attackKind="special";f.motionDuration=260;f.attackTime=260;f.cool=850;f.comboWindow=0;f.pendingHit=null;
-  const q=f.d.shot,boost=1.45;
+  const q=f.d.shot,boost=1.45;f.shotCool=Math.max(f.shotCool,q.cool);
   const spawn=(vy=0,off=0)=>shots.push({x:f.x+f.dir*25,y:f.y-65+off,vx:f.dir*q.speed*1.2,vy,damage:Math.round(q.damage*boost),size:q.size*1.25,color:q.color,owner:f,life:160,type:q.type||"normal",hitCount:0,turn:false});
   if(q.type==="triple"){spawn(-1,-8);spawn();spawn(1,8)}else spawn();
   say(f.d.name+"："+f.d.special+"・連環弾 ↓→+P");
@@ -119,7 +119,7 @@ function melee(f,t,kind){
  }
 }
 function shoot(f,forced=false){
- if(!running||f.shotCool>0||f.stun>0||(f.attackTime>0&&!forced))return;
+ if(!running||f.shotCool>0||f.stun>0||(f.attackTime>0&&!forced)){if(f.shotCool>0)f.comboBoost=1;return;}
  const q=f.d.shot,type=q.type||"normal",superBoost=(f.attackKind==="super"?1.8:1)*(f.comboBoost||1);
  const spawn=(vy=0,offset=0)=>shots.push({x:f.x+f.dir*25,y:f.y-65+offset,vx:f.dir*q.speed,vy,damage:Math.round(q.damage*superBoost),size:q.size*(superBoost>1?1.5:1),color:q.color,owner:f,life:type==="trap"?240:150,type,hitCount:0,turn:false});
  if(type==="triple"){spawn(-1.05,-9);spawn(0,0);spawn(1.05,9)}else spawn();
@@ -128,8 +128,10 @@ function shoot(f,forced=false){
 function special(f,t){
  const chained=f.comboWindow>0&&f.attackTime<120&&!f.pendingHit;
  if(!running||f.stun>0||f.attackTime>0&&!chained||f.cool>0&&!chained)return;
+ const name=f.d.name;
+ if((name==="大塚蒼生"||name==="漆原")&&f.shotCool>0){say(name+"：技再使用待機");return}
  const routeHit=recordCombo(f,"S");
- const name=f.d.name,powered=f.super>=100;
+ const powered=f.super>=100;
  if(powered)f.super=0;
  f.comboBoost=routeHit?1.2:1;
  f.cool=name==="私和"?560:760;f.attackTime=powered?420:190;f.motionDuration=f.attackTime;
