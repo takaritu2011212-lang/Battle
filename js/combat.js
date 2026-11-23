@@ -52,8 +52,8 @@ function attackButton(f,t,code){
  if(!running||(code!=="P"&&code!=="K")||f.stun>0||(!f.ground&&f.airAttackUsed))return;
  const chained=f.comboWindow>0&&f.attackTime<120&&!f.pendingHit;
  if((f.attackTime>0||f.cool>0)&&!chained)return;
- if(tryCommand(f,t,code))return;
  f.dir=t.x>=f.x?1:-1;
+ if(tryCommand(f,t,code))return;
  const crouch=f.ground&&(f.crouch||f===p&&axisY>.35||f===p&&keys.arrowdown);
  const airborne=!f.ground;
  const toward=f===p?((axis>0&&f.dir>0)||(axis<0&&f.dir<0)||((keys.d||keys.right||keys.arrowright)&&f.dir>0)||((keys.a||keys.left||keys.arrowleft)&&f.dir<0)):Math.abs(t.x-f.x)>f.d.reach+10;
