@@ -77,7 +77,8 @@ function drawFighter(c,f,mini=false){
  c.drawImage(spriteCache[f.d.name],-w/2,-h,w,h);
  if(jumping){c.fillStyle="#dff5ff88";c.fillRect(-w*.48,-h-8,w*.96,4)}
  if(f.guard){
-  c.strokeStyle=m.color||"#9fe5ff";c.lineWidth=3;c.beginPath();c.arc(w*.24,-h*.53,w*.38,-1.3,1.1);c.stroke();
+  c.fillStyle=m.color||"#9fe5ff";
+  for(let i=0;i<8;i++){const a=-1.3+i*.3,gx=w*.24+Math.cos(a)*w*.38,gy=-h*.53+Math.sin(a)*h*.38;c.fillRect(gx,gy,5,5)}
  }
  drawMotionFX(c,f,w,h,1-clamp((f.attackTime||0)/Math.max(1,f.motionDuration||220),0,1));
  if(f.flash>0){c.globalAlpha=.3;c.fillStyle="#fff";c.fillRect(-w/2,-h,w,h);c.globalAlpha=1}
