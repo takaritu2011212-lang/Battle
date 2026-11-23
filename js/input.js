@@ -21,7 +21,6 @@ document.addEventListener("keyup",ev=>{
  if(k==="arrowup"||k==="w")keys.jump=false;
 });
 const zone=$("stickZone"),knob=$("stickKnob");
-let stickPointer=null;
 function stickMove(ev){
  const r=zone.getBoundingClientRect();
  let dx=ev.clientX-(r.left+r.width/2),dy=ev.clientY-(r.top+r.height/2);
