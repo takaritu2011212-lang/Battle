@@ -23,7 +23,7 @@ function recordCombo(f,token){
  return hit;
 }
 function tryCommand(f,t,code){
- const chained=f.comboWindow>0&&f.attackTime<120;
+ const chained=f.comboWindow>0&&f.attackTime<120&&!f.pendingHit;
  if(f.stun>0||f.attackTime>0&&!chained||f.cool>0&&!chained)return false;
  const now=performance.now();
  f.commandBuffer=(f.commandBuffer||[]).filter(v=>now-v.t<950);
@@ -50,7 +50,7 @@ function tryCommand(f,t,code){
 }
 function attackButton(f,t,code){
  if(!running||(code!=="P"&&code!=="K")||f.stun>0||(!f.ground&&f.airAttackUsed))return;
- const chained=f.comboWindow>0&&f.attackTime<120;
+ const chained=f.comboWindow>0&&f.attackTime<120&&!f.pendingHit;
  if((f.attackTime>0||f.cool>0)&&!chained)return;
  if(tryCommand(f,t,code))return;
  f.dir=t.x>=f.x?1:-1;
@@ -68,7 +68,7 @@ function attackButton(f,t,code){
  const recovery=f.d.motion?.recovery||1;
  const attackTime=Math.round((strong?280:airborne?190:code==="K"?195:155)*recovery);
  const cooldown=Math.round((strong?620:airborne?390:code==="K"?360:260)*recovery);
- f.attackKind=airborne?"air-"+rank:rank;
+ f.attackKind=airborne?"air-"+(code==="K"?"medium":"weak"):rank;
  f.attackTime=attackTime;f.motionDuration=attackTime;f.cool=cooldown;
  f.comboWindow=strong?0:620;f.comboStage=stage;f.moveState="attack";f.moveTimer=attackTime;
  if(!f.ground)f.airAttackUsed=true;
@@ -126,7 +126,7 @@ function shoot(f,forced=false){
  f.shotCool=q.cool;f.attackTime=155;f.motionDuration=155;f.attackKind="shot";f.comboWindow=0;f.comboBoost=1;say(f.d.name+"："+q.name+"！");
 }
 function special(f,t){
- const chained=f.comboWindow>0&&f.attackTime<120;
+ const chained=f.comboWindow>0&&f.attackTime<120&&!f.pendingHit;
  if(!running||f.stun>0||f.attackTime>0&&!chained||f.cool>0&&!chained)return;
  const routeHit=recordCombo(f,"S");
  const name=f.d.name,powered=f.super>=100;
